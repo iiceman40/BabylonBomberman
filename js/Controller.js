@@ -20,121 +20,23 @@ $(document).ready(function () {
 	var camera = new BABYLON.ArcRotateCamera("cam", -1.57079633, 0, 80, new BABYLON.Vector3(0, 0, 0), scene);
 	camera.attachControl(engine.getRenderingCanvas());
 
+	var materials = new Materials(scene);
 
-	/* MATERIALS */
-	var mat = new BABYLON.StandardMaterial("mat", scene);
-	mat.diffuseColor = BABYLON.Color3.FromInts(121, 189, 224);
-
-	var gray = new BABYLON.StandardMaterial("gray", scene);
-	gray.diffuseColor = BABYLON.Color3.FromInts(115, 135, 155);
-	gray.specularPower = 1000;
-
-	var green = new BABYLON.StandardMaterial("green", scene);
-	green.diffuseColor = BABYLON.Color3.Green();
-
-	var red = new BABYLON.StandardMaterial("red", scene);
-	red.diffuseColor = BABYLON.Color3.Red();
-
-	var blue = new BABYLON.StandardMaterial("blue", scene);
-	blue.diffuseColor = BABYLON.Color3.Blue();
-
-	var yellow = new BABYLON.StandardMaterial("yellow", scene);
-	yellow.diffuseColor = BABYLON.Color3.Yellow();
-
-	var black = new BABYLON.StandardMaterial("black", scene);
-	black.diffuseColor = BABYLON.Color3.Black();
-
-	var portalGround = new BABYLON.StandardMaterial("portalGround", scene);
-	portalGround.diffuseTexture = new BABYLON.Texture("textures/portal-tile-dark.jpg", scene);
-	portalGround.diffuseTexture.uScale = 19.0;
-	portalGround.diffuseTexture.vScale = 11.0;
-	portalGround.diffuseTexture.uOffset = 0.5;
-	portalGround.specularColor = BABYLON.Color3.Gray();
-	portalGround.bumpTexture = new BABYLON.Texture("textures/portal-tile-dark-normalmap.jpg", scene);
-	portalGround.bumpTexture.uScale = 19.0;
-	portalGround.bumpTexture.vScale = 11.0;
-	portalGround.bumpTexture.uOffset = 0.5;
-
-	var portalBox = new BABYLON.StandardMaterial("portalGround", scene);
-	portalBox.diffuseTexture = new BABYLON.Texture("textures/portal-tile.jpg", scene);
-	portalBox.specularColor = BABYLON.Color3.White();
-	portalBox.bumpTexture = new BABYLON.Texture("textures/portal-tile-normalmap2.jpg", scene);
-
-
-	/* LIGHT */
-	var light = new BABYLON.DirectionalLight("light", new BABYLON.Vector3(-1, -2, -1), scene);
-	light.position = new BABYLON.Vector3(40, 50, 40);
-	light.intensity = 0.5;
-	//light.range = 300;
-	var lightBulb = BABYLON.Mesh.CreateSphere("lightBulb", 16, 4, scene);
-	lightBulb.position = light.position;
-	lightBulb.material = yellow;
-
-	var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
-	hemiLight.diffuse = new BABYLON.Color3(0.1, 0.1, 0.1);
-	hemiLight.specular = new BABYLON.Color3(0.5, 0.5, 0.5);
-	hemiLight.groundColor = new BABYLON.Color3(0.3, 0.3, 0.3);
-
-	/* SHADOW */
-	var shadowGenerator = new BABYLON.ShadowGenerator(8192, light);
-	shadowGenerator.useVarianceShadowMap = false;
-	shadowGenerator.usePoissonSampling = true;
-
-
-	/* GROUND */
-	var ground = BABYLON.Mesh.CreateGround("ground", map.width - 5, map.height - 5, 1, scene);
-	ground.material = portalGround;
-	ground.receiveShadows = true;
-	ground.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {mass: 0, restitution: 0.1, friction: 1});
-
-
-	/* WALLS */
-	var wallBottom = BABYLON.Mesh.CreateBox("wallBottom", 1.0, scene);
-	wallBottom.scaling = new BABYLON.Vector3(map.width - 3, 10, 1);
-	wallBottom.position.z = -map.height / 2 + 2;
-	wallBottom.material = mat;
-	wallBottom.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {mass: 0, restitution: 0.1, friction: 0.1});
-	wallBottom.isFixedBox = true;
-	wallBottom.receiveShadows = true;
-	shadowGenerator.getShadowMap().renderList.push(wallBottom);
-
-	var wallTop = BABYLON.Mesh.CreateBox("wallTop", 1.0, scene);
-	wallTop.scaling = new BABYLON.Vector3(map.width - 3, 10, 1);
-	wallTop.position.z = map.height / 2 - 2;
-	wallTop.material = mat;
-	wallTop.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {mass: 0, restitution: 0.1, friction: 0.1});
-	wallTop.isFixedBox = true;
-	wallTop.receiveShadows = true;
-	shadowGenerator.getShadowMap().renderList.push(wallTop);
-
-	var wallLeft = BABYLON.Mesh.CreateBox("wallLeft", 1.0, scene);
-	wallLeft.scaling = new BABYLON.Vector3(1, 10, map.height - 5);
-	wallLeft.position.x = -map.width / 2 + 2;
-	wallLeft.material = mat;
-	wallLeft.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {mass: 0, restitution: 0.1, friction: 0.1});
-	wallLeft.isFixedBox = true;
-	wallLeft.receiveShadows = true;
-	shadowGenerator.getShadowMap().renderList.push(wallLeft);
-
-	var wallRight = BABYLON.Mesh.CreateBox("wallRight", 1.0, scene);
-	wallRight.scaling = new BABYLON.Vector3(1, 10, map.height - 5);
-	wallRight.position.x = map.width / 2 - 2;
-	wallRight.material = mat;
-	wallRight.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {mass: 0, restitution: 0.1, friction: 0.1});
-	wallRight.isFixedBox = true;
-	wallRight.receiveShadows = true;
-	shadowGenerator.getShadowMap().renderList.push(wallRight);
-
+	var game = new Game(scene, map, materials, availablePowerUps);
+	var light = game.light;
+	var shadowGenerator = game.shadowGenerator;
 
 	/* PLAYERS */
 	var players = [];
-	players.push(createPlayer(green, new BABYLON.Vector3(-map.width / 2 + 5, 10, map.height / 2 - 5)));
-	players.push(createPlayer(blue, new BABYLON.Vector3(map.width / 2 - 5, 10, -map.height / 2 + 5)));
+	players.push(new Player('Player1', materials.green, new BABYLON.Vector3(-map.width / 2 + 5, 10, map.height / 2 - 5), scene));
+	players.push(new Player('Player2', materials.blue, new BABYLON.Vector3(map.width / 2 - 5, 10, -map.height / 2 + 5), scene));
+	players.push(new Player('Player3', materials.red, new BABYLON.Vector3(-map.width / 2 + 5, 10, -map.height / 2 + 5), scene));
+	players.push(new Player('Player4', materials.yellow, new BABYLON.Vector3(map.width / 2 - 5, 10, map.height / 2 - 5), scene));
 
 	/* BOXES */
 	var fixedBox = BABYLON.Mesh.CreateBox("fixedBox", 5, scene);
 	fixedBox.position.y = 10000;
-	fixedBox.material = portalBox;
+	fixedBox.material = materials.portalBox;
 
 
 	BABYLON.SceneLoader.ImportMesh("Cube", "models/", "cube.babylon", scene, function (meshes) {
@@ -143,11 +45,11 @@ $(document).ready(function () {
 		cube.isVisible = true;
 		cube.scaling = new BABYLON.Vector3(2.1, 2.1, 2.1);
 		cube.receiveShadows = true;
-		cube.material = gray;
+		cube.material = materials.gray;
 		shadowGenerator.getShadowMap().renderList.push(cube);
 
 		powerUpLimit = meshes[0].clone();
-		powerUpLimit.material = blue;
+		powerUpLimit.material = materials.blue;
 		powerUpLimit.position.y = -15;
 		powerUpLimit.powerUpEffect = function (player) {
 			player.limit += 1;
@@ -155,7 +57,7 @@ $(document).ready(function () {
 		availablePowerUps.push(powerUpLimit);
 
 		powerUpRange = meshes[0].clone();
-		powerUpRange.material = yellow;
+		powerUpRange.material = materials.yellow;
 		powerUpRange.position.y = -20;
 		powerUpRange.powerUpEffect = function (player) {
 			player.range += 5;
@@ -205,31 +107,70 @@ $(document).ready(function () {
 		handleKeyDown(evt.keyCode);
 	});
 
+	// TODO put in config file
 	DIRECTIONS = {
-		KEYPAD: {
-			TOP: 104,
-			BOT: 101,
-			LEFT: 100,
-			RIGHT: 102,
-			BOMB: 96
-		},
-		QWSD: {
+		// WASD
+		PLAYER0: {
 			TOP: 87,
 			BOT: 83,
 			LEFT: 65,
 			RIGHT: 68,
 			BOMB: 32
+		},
+		// NUMPAD
+		PLAYER1: {
+			TOP: 104,
+			BOT: 101,
+			LEFT: 100,
+			RIGHT: 102,
+			BOMB: 96
 		}
 	};
 
-	var mvtDirection = {};
-	mvtDirection.player1 = [0, 0, 0, 0];
-	mvtDirection.player2 = [0, 0, 0, 0];
+	var gamepadConnected = function (gamepad) {
+		var playerIndex = gamepad.index + 2; // since the first 2 players controlled by the keyboad for now
+		var player = players[playerIndex];
+
+		console.log(navigator.getGamepads(), playerIndex);
+
+		if(player){
+			gamepad.onleftstickchanged(function (values) {
+				if (Math.round(values.y) < 0)
+					player.chooseDirection(0, 1);
+				if (Math.round(values.y) > 0)
+					player.chooseDirection(1, 1);
+				if (Math.round(values.x) < 0)
+					player.chooseDirection(2, 1);
+				if (Math.round(values.x) > 0)
+					player.chooseDirection(3, 1);
+
+				if (Math.round(values.y) == 0) {
+					player.chooseDirection(0, 0);
+					player.chooseDirection(1, 0);
+				}
+				if (Math.round(values.x) == 0) {
+					player.chooseDirection(2, 0);
+					player.chooseDirection(3, 0);
+				}
+			});
+
+			gamepad.onbuttondown(function (buttonIndex) {
+				placeBomb(player);
+			});
+
+			gamepad.onbuttonup(function (buttonIndex) {
+			});
+		}
+
+	};
+
+	var gamepads = new BABYLON.Gamepads(gamepadConnected);
+
 
 	var update = function () {
 		// move players
 		for (var i = 0; i < players.length; i++) {
-			move(players[i]);
+			players[i].move();
 		}
 
 		// move light
@@ -239,123 +180,52 @@ $(document).ready(function () {
 
 	};
 
-	var move = function (player) {
-
-		var s = player.speed;
-
-		var moveVector = new BABYLON.Vector3(0, 0, 0);
-
-		if (player.mvtDirection[0] != 0) {
-			moveVector = moveVector.add(new BABYLON.Vector3(0, 0, 1));
-		}
-		if (player.mvtDirection[1] != 0) {
-			moveVector = moveVector.add(new BABYLON.Vector3(0, 0, -1));
-		}
-		if (player.mvtDirection[2] != 0) {
-			moveVector = moveVector.add(new BABYLON.Vector3(-1, 0, 0));
-		}
-		if (player.mvtDirection[3] != 0) {
-			moveVector = moveVector.add(new BABYLON.Vector3(1, 0, 0));
-		}
-		player.impostor.body.linearVelocity.scaleEqual(0.8);
-		player.impostor.body.angularVelocity = new OIMO.Vec3();
-		player.impostor.body.angularVelocity.scaleEqual(0);
-		player.applyImpulse(moveVector.normalize().scale(s), player.position);
-
-	};
-
-	var chooseDirection = function (direction, value, player) {
-		player.mvtDirection[direction] = value;
-	};
-
 	var handleKeyDown = function (keycode) {
-		switch (keycode) {
-			// player 0
-			case DIRECTIONS.QWSD.TOP :
-				chooseDirection(0, 1, players[0]);
-				break;
-			case DIRECTIONS.QWSD.BOT :
-				chooseDirection(1, 1, players[0]);
-				break;
-			case DIRECTIONS.QWSD.LEFT :
-				chooseDirection(2, 1, players[0]);
-				break;
-			case DIRECTIONS.QWSD.RIGHT :
-				chooseDirection(3, 1, players[0]);
-				break;
-			case DIRECTIONS.QWSD.BOMB:
-				placeBomb(players[0]);
-				break;
-			// player 1
-			case DIRECTIONS.KEYPAD.TOP :
-				chooseDirection(0, 1, players[1]);
-				break;
-			case DIRECTIONS.KEYPAD.BOT :
-				chooseDirection(1, 1, players[1]);
-				break;
-			case DIRECTIONS.KEYPAD.LEFT:
-				chooseDirection(2, 1, players[1]);
-				break;
-			case DIRECTIONS.KEYPAD.RIGHT:
-				chooseDirection(3, 1, players[1]);
-				break;
-			case DIRECTIONS.KEYPAD.BOMB:
-				placeBomb(players[1]);
-				break;
+		for (var i = 0; i < players.length; i++) {
+			if(DIRECTIONS['PLAYER'+i]) {
+				switch (keycode) {
+					case DIRECTIONS['PLAYER' + i].TOP :
+						players[i].chooseDirection(0, 1);
+						break;
+					case DIRECTIONS['PLAYER' + i].BOT :
+						players[i].chooseDirection(1, 1);
+						break;
+					case DIRECTIONS['PLAYER' + i].LEFT :
+						players[i].chooseDirection(2, 1);
+						break;
+					case DIRECTIONS['PLAYER' + i].RIGHT :
+						players[i].chooseDirection(3, 1);
+						break;
+					case DIRECTIONS['PLAYER' + i].BOMB:
+						placeBomb(players[i]);
+						break;
+				}
+			}
 		}
 	};
 
 	var handleKeyUp = function (keycode) {
-		switch (keycode) {
-			case DIRECTIONS.KEYPAD.TOP :
-				chooseDirection(0, 0, players[1]);
-				break;
-			case DIRECTIONS.QWSD.TOP :
-				chooseDirection(0, 0, players[0]);
-				break;
-			case DIRECTIONS.KEYPAD.BOT :
-				chooseDirection(1, 0, players[1]);
-				break;
-			case DIRECTIONS.QWSD.BOT :
-				chooseDirection(1, 0, players[0]);
-				break;
-			case DIRECTIONS.KEYPAD.LEFT:
-				chooseDirection(2, 0, players[1]);
-				break;
-			case DIRECTIONS.QWSD.LEFT :
-				chooseDirection(2, 0, players[0]);
-				break;
-			case DIRECTIONS.KEYPAD.RIGHT:
-				chooseDirection(3, 0, players[1]);
-				break;
-			case DIRECTIONS.QWSD.RIGHT :
-				chooseDirection(3, 0, players[0]);
-				break;
+		for (var i = 0; i < players.length; i++) {
+			if(DIRECTIONS['PLAYER'+i]) {
+				switch (keycode) {
+					case DIRECTIONS['PLAYER' + i].TOP :
+						players[i].chooseDirection(0, 0);
+						break;
+					case DIRECTIONS['PLAYER' + i].BOT :
+						players[i].chooseDirection(1, 0);
+						break;
+					case DIRECTIONS['PLAYER' + i].LEFT :
+						players[i].chooseDirection(2, 0);
+						break;
+					case DIRECTIONS['PLAYER' + i].RIGHT :
+						players[i].chooseDirection(3, 0);
+						break;
+				}
+			}
 		}
 	};
 
-	function createPlayer(material, spawnPosition) {
-		var player = BABYLON.Mesh.CreateSphere("player1", 16, 4, scene);
-		player.position = spawnPosition;
-		player.impostor = player.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, {
-			mass: 30,
-			friction: 1,
-			restitution: 0.5
-		});
-
-		player.speed = 3;
-		player.limit = 1;
-		player.range = 5;
-		player.activeBombs = 0;
-
-		player.mvtDirection = [0, 0, 0, 0];
-		player.material = material;
-		player.receiveShadows = true;
-		shadowGenerator.getShadowMap().renderList.push(player);
-
-		return player;
-	};
-
+	// TODO move to Game Class
 	function createMap(box, fixedBox) {
 		// TODO use a grid system to place boxes and handle their state
 		for (var y = -5; y < map.height - 10; y++) {
@@ -392,11 +262,12 @@ $(document).ready(function () {
 		}
 	}
 
+	// TODO move to Player class
 	function placeBomb(player) {
 		var bombPosition = new BABYLON.Vector3(
-			Math.round(player.position.x / 5) * 5,
-			player.position.y,
-			Math.round(player.position.z / 5) * 5
+			Math.round(player.avatar.position.x / 5) * 5,
+			player.avatar.position.y,
+			Math.round(player.avatar.position.z / 5) * 5
 		);
 
 		var spotOccupied = false;
@@ -408,7 +279,7 @@ $(document).ready(function () {
 
 		if (!spotOccupied && player.activeBombs < player.limit) {
 			var bomb = BABYLON.Mesh.CreateSphere("bomb", 16, 4, scene);
-			bomb.material = black;
+			bomb.material = materials.black;
 			bomb.position = bombPosition;
 			bomb.isBomb = true;
 			bomb.player = player;
@@ -417,8 +288,8 @@ $(document).ready(function () {
 			// We must create a new ActionManager for our building in order to use Actions.
 			bomb.actionManager = new BABYLON.ActionManager(scene);
 			// The trigger is OnIntersectionEnterTrigger
-			var enterTrigger = {trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: player};
-			var exitTrigger = {trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: player};
+			var enterTrigger = {trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: player.avatar};
+			var exitTrigger = {trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: player.avatar};
 			bomb.actionManager.registerAction(new BABYLON.DoNothingAction(enterTrigger));
 			bomb.actionManager.registerAction(new BABYLON.ExecuteCodeAction(exitTrigger, function () {
 				if (!bomb.isExploding) {
@@ -452,6 +323,7 @@ $(document).ready(function () {
 
 	}
 
+	// TODO move to Bomb Class
 	function explodeBomb(bomb) {
 		bomb.isExploding = true;
 		clearTimeout(bomb.timer);
@@ -465,10 +337,6 @@ $(document).ready(function () {
 		var rayOfFireBottom = createRayOfFire(bomb, new BABYLON.Vector3(0, 0, 7), bombRange);
 		// Start the particle system
 		rayOfFireLeft.start();
-		setTimeout(function(){
-			console.log(rayOfFireLeft.particles);
-		}, 50);
-
 		rayOfFireRight.start();
 		rayOfFireTop.start();
 		rayOfFireBottom.start();
@@ -480,41 +348,33 @@ $(document).ready(function () {
 			rayOfFireBottom.stop();
 			var emitter = bomb.position.clone();
 			createSmoke(emitter);
+			bomb.isExploding = false;
+
+			// remove bomb from bombs array
+			var index = bombs.indexOf(bomb);
+			if (index > -1) {
+				bombs.splice(index, 1);
+			}
+
 			bomb.dispose();
 		}, 1000);
 
-		// remove bomb from bombs array
-		var index = bombs.indexOf(bomb);
-		if (index > -1) {
-			bombs.splice(index, 1);
-		}
 	}
 
+	// TODO move to Bomb class
 	function createRayOfFire(bomb, direction, bombRange) {
 		bomb.visibility = false;
-		// init distance to target
-		var distance = Infinity;
-		var rayPick = new BABYLON.Ray(bomb.position, direction);
-		var meshFound = scene.pickWithRay(rayPick, function (item) {
-			return item.isDestroyable || item.isFixedBox || item.isBomb && item != bomb;
-		});
 
-		if (meshFound.pickedMesh) {
-			// set distance to actual target
-			bombPos = bomb.position;
-			targetPos = meshFound.pickedMesh.position;
-			distance = Math.round(Math.abs(bombPos.x - targetPos.x) + Math.abs(bombPos.z - targetPos.z));
-			// check if target found within the bomb range
-			if (distance <= bombRange) {
-				if (meshFound.pickedMesh.isBomb && !meshFound.pickedMesh.isExploding) {
-					// chain bombs
-					explodeBomb(meshFound.pickedMesh);
-				} else if (meshFound.pickedMesh.isDestroyable) {
-					// destroy box
-					destroyBox(meshFound.pickedMesh);
-				}
-			}
-		}
+		var distance = checkForHit(bomb, direction, bombRange, Infinity);
+		console.log(distance);
+
+		var checkingForHit = setInterval(function(){
+			checkForHit(bomb, direction, bombRange, distance);
+		}, 100);
+
+		setTimeout(function(){
+			clearInterval(checkingForHit);
+		}, 1000);
 
 		/* RAY OF FIRE EFFECT */
 		// cap ray of fire to stop at target
@@ -534,7 +394,7 @@ $(document).ready(function () {
 		// Colors of all particles
 		particleSystem.color1 = new BABYLON.Color4(1, 0, 0, 1.0);
 		particleSystem.color2 = new BABYLON.Color4(0.8, 0.8, 0, 0.5);
-		particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
+		particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.3);
 		// Size of each particle (random between...
 		particleSystem.minSize = 3;
 		particleSystem.maxSize = 5;
@@ -554,12 +414,58 @@ $(document).ready(function () {
 		// Speed
 		particleSystem.minEmitPower = 20;
 		particleSystem.maxEmitPower = 20;
-		particleSystem.updateSpeed = 0.02;
+		particleSystem.updateSpeed = 0.01;
 
 		return particleSystem;
 	}
 
+	function checkForHit(bomb, direction, bombRange, distanceLimit){
+		// init distance to target
+		var distance = Infinity;
+		var rayPick = new BABYLON.Ray(bomb.position, direction);
+		var meshFound = scene.pickWithRay(rayPick, function (item) {
+			return (item.player || item.isDestroyable || item.isFixedBox || item.isBomb) && item != bomb;
+		});
+
+		// check what got hit by the explosion
+		var target = meshFound.pickedMesh;
+		if (target) {
+			// set distance to actual target
+			distance = bomb.position.subtract(target.position).length();
+			// check if target found within the bomb range
+			if (distance <= bombRange + 2.5 && distance < distanceLimit) {
+				if (target.isBomb && !target.isExploding) {
+					// chain bombs
+					explodeBomb(target);
+				} else if (target.isDestroyable && !target.isDestroyed) {
+					// destroy box
+					destroyBox(target);
+				} else if (target.player) {
+					// kill player
+					target.player.isDead = true;
+					target.dispose();
+					// check remaining players
+					setTimeout(function () {
+						var remainingPlayers = [];
+						for (var i = 0; i < players.length; i++) {
+							if (!players[i].isDead) {
+								remainingPlayers.push(players[i]);
+							}
+						}
+						if (remainingPlayers.length == 1) {
+							alert(remainingPlayers[0].name + ' wins!');
+						}
+					}, 200);
+				}
+			}
+		}
+
+		return distance;
+	}
+
+	// TODO create a Box Class??
 	function destroyBox(box){
+		box.isDestroyed = true;
 		// particle effects
 		var emitter = box.position.clone();
 		createFragments(emitter);
@@ -586,6 +492,7 @@ $(document).ready(function () {
 		}, 500);
 	}
 
+	// TODO move to PowerUp class as constuctor
 	function spawnPowerUp(box) {
 		var randomIndex = Math.floor(Math.random() * availablePowerUps.length);
 		var powerUpPrototype = availablePowerUps[randomIndex];
@@ -611,7 +518,7 @@ $(document).ready(function () {
 		for (var i = 0; i < players.length; i++) {
 			(function (e) {
 				var player = players[e];
-				var enterTrigger = {trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: player};
+				var enterTrigger = {trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: player.avatar};
 				var usePowerUpAction = new BABYLON.ExecuteCodeAction(enterTrigger, function () {
 					newPowerUp.powerUpEffect(player);
 					newPowerUp.dispose();
@@ -661,6 +568,7 @@ $(document).ready(function () {
 		particleSystem.start();
 	}
 
+	// TODO move to Bomb Class
 	function createSmoke(emitter){
 		// Create a particle system
 		var particleSystem = new BABYLON.ParticleSystem("particles", 20, scene);
