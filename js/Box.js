@@ -5,9 +5,9 @@ var Box = function (scene, position, boxTemplate, name, shadowGenerator, availab
 	boxAvatar.position = position;
 	boxAvatar.boxForThisAvatar = self;
 	boxAvatar.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {
-		mass: 100,
-		friction: 1,
-		restitution: 0.1
+		mass: 0,
+		friction: 0.001,
+		restitution: 0.001
 	});
 	boxAvatar.applyGravity = true;
 	boxAvatar.receiveShadows = true;

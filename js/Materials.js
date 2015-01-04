@@ -21,6 +21,9 @@ var Materials = function(scene) {
 	this.black = new BABYLON.StandardMaterial("black", scene);
 	this.black.diffuseColor = BABYLON.Color3.Black();
 
+	this.glowingPurple = new BABYLON.StandardMaterial("purple", scene);
+	this.glowingPurple.emissiveColor = BABYLON.Color3.Purple();
+
 	this.portalGround = new BABYLON.StandardMaterial("portalGround", scene);
 	this.portalGround.diffuseTexture = new BABYLON.Texture("textures/portal-tile-dark.jpg", scene);
 	this.portalGround.diffuseTexture.uScale = 19.0;

@@ -13,9 +13,9 @@ var PowerUp = function (scene, position, players, availablePowerUps) {
 	// power up rotation animation
 	var animationPowerUpRotation = new BABYLON.Animation("rotatePowerUp", "rotation.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 	var rotationAnimationKeys = [
-		{frame:0, value: 0},
-		{frame:50, value: Math.PI/2},
-		{frame:100, value: Math.PI}
+		{frame: 0, value: 0},
+		{frame: 50, value: Math.PI/2},
+		{frame: 100, value: Math.PI}
 	];
 	animationPowerUpRotation.setKeys(rotationAnimationKeys);
 	newPowerUp.animations.push(animationPowerUpRotation);
@@ -23,11 +23,11 @@ var PowerUp = function (scene, position, players, availablePowerUps) {
 	// power up hover animation
 	var animationPowerUpHover = new BABYLON.Animation("hoverPowerUp", "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 	var hoverAnimationKeys = [
-		{frame:0, value: newPowerUp.position.y},
-		{frame:25, value: 3.5},
-		{frame:50, value: newPowerUp.position.y},
-		{frame:75, value: 3.5},
-		{frame:100, value: newPowerUp.position.y}
+		{frame: 0, value: newPowerUp.position.y},
+		{frame: 25, value: 3.5},
+		{frame: 50, value: newPowerUp.position.y},
+		{frame: 75, value: 3.5},
+		{frame: 100, value: newPowerUp.position.y}
 	];
 	animationPowerUpHover.setKeys(hoverAnimationKeys);
 

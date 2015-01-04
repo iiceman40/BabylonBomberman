@@ -14,22 +14,23 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 	bombAvatar.bombForThisAvatar = self;
 	shadowGenerator.getShadowMap().renderList.push(bombAvatar);
 
-	// We must create a new ActionManager for our building in order to use Actions.
+	// Actions
 	bombAvatar.actionManager = new BABYLON.ActionManager(scene);
 	// The trigger is OnIntersectionEnterTrigger
-	var enterTrigger = {trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: this.avatar};
-	var exitTrigger = {trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: this.avatar};
+	var enterTrigger = {trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: self.playerForThisBomb.avatar};
+	var exitTrigger = {trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: self.playerForThisBomb.avatar};
 	bombAvatar.actionManager.registerAction(new BABYLON.DoNothingAction(enterTrigger));
 	bombAvatar.actionManager.registerAction(new BABYLON.ExecuteCodeAction(exitTrigger, function () {
 		if (!self.isExploding) {
 			bombAvatar.impostor = bombAvatar.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, {
-				mass: 0,
-				friction: 1,
-				restitution: 0
+				mass: 100000,
+				friction: 0.001,
+				restitution: 0.999
 			});
 		}
 	}));
 
+	// bomb pulse animation
 	var animationBombPulse = new BABYLON.Animation("bombAnimation", "scaling", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 	var keyFramesBombPulse = [
 		{frame: 0, value: new BABYLON.Vector3(1, 1, 1)},
@@ -47,7 +48,6 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 	 * METHODS
 	 */
 	this.explode = function (bombs, players) {
-		console.log('DEBUG - exploding bomb', self);
 		self.isExploding = true;
 		clearTimeout(this.timer);
 
