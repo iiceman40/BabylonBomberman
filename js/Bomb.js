@@ -1,9 +1,8 @@
 var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, shadowGenerator) {
 	var self = this;
 
-	this.isBomb = true; // TODO remove and add check for class instead??
 	this.isExploding = false;
-	this.playerForThisBombAvatar = player;
+	this.playerForThisBomb = player;
 	this.timer = setTimeout(function () {
 		self.explode(bombs, players);
 	}, 3000);
@@ -12,6 +11,7 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 	bombAvatar.material = bombMaterial;
 	bombAvatar.position = bombPosition;
 	bombAvatar.receiveShadows = true;
+	bombAvatar.bombForThisAvatar = self;
 	shadowGenerator.getShadowMap().renderList.push(bombAvatar);
 
 	// We must create a new ActionManager for our building in order to use Actions.
@@ -47,11 +47,12 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 	 * METHODS
 	 */
 	this.explode = function (bombs, players) {
+		console.log('DEBUG - exploding bomb', self);
 		self.isExploding = true;
 		clearTimeout(this.timer);
 
-		var bombRange = this.playerForThisBombAvatar.range;
-		this.playerForThisBombAvatar.activeBombs -= 1;
+		var bombRange = this.playerForThisBomb.range;
+		this.playerForThisBomb.activeBombs -= 1;
 
 		var rayOfFireLeft = self.createRayOfFire(new BABYLON.Vector3(-7, 0, 0), bombRange, players);
 		var rayOfFireRight = self.createRayOfFire(new BABYLON.Vector3(7, 0, 0), bombRange, players);
@@ -145,7 +146,7 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 		var distance = Infinity;
 		var rayPick = new BABYLON.Ray(self.avatar.position, direction);
 		var meshFound = scene.pickWithRay(rayPick, function (item) {
-			return (item.playerForThisBombAvatar || item.boxForThisAvatar || item.isFixedBox || item.isBomb) && item != self.avatar;
+			return (item.playerForThisBomb || item.boxForThisAvatar || item.isFixedBox || item.bombForThisAvatar) && item != self.avatar;
 		});
 
 		// check what got hit by the explosion
@@ -156,17 +157,16 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 
 			// check if target found within the bomb range
 			if (distance <= bombRange + 2.5 && distance < distanceLimit) {
-				console.log(target);
 
-				if (target.isBomb && !target.isExploding) {
+				if (target.bombForThisAvatar && !target.bombForThisAvatar.isExploding) {
 					// chain bombs
-					target.explode(bombs, players);
+					target.bombForThisAvatar.explode(bombs, players);
 				} else if (target.boxForThisAvatar) {
 					// destroy box
 					target.boxForThisAvatar.destroy();
-				} else if (target.playerForThisBombAvatar) {
+				} else if (target.playerForThisBomb) {
 					// kill player
-					target.playerForThisBombAvatar.die(players);
+					target.playerForThisBomb.die(players);
 				}
 
 			}

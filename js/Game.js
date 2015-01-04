@@ -1,5 +1,8 @@
-var Game = function (scene, map, materials, availablePowerUps) {
+var Game = function (scene, map, materials, players) {
 	var self = this;
+
+	this.bombs = [];
+	this.availablePowerUps = [];
 
 	/* LIGHT */
 	this.light = new BABYLON.DirectionalLight("light", new BABYLON.Vector3(-1, -2, -1), scene);
@@ -60,5 +63,201 @@ var Game = function (scene, map, materials, availablePowerUps) {
 	this.wallRight.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {mass: 0, restitution: 0.1, friction: 0.1});
 	this.wallRight.receiveShadows = true;
 	this.shadowGenerator.getShadowMap().renderList.push(this.wallRight);
+
+	/* BOXES */
+	var fixedBox = BABYLON.Mesh.CreateBox("fixedBox", 5, scene);
+	fixedBox.position.y = 10000;
+	fixedBox.material = materials.portalBox;
+
+
+	// load models and init map when ready
+	BABYLON.SceneLoader.ImportMesh("Cube", "models/", "cube.babylon", scene, function (meshes) {
+		var cube = meshes[0];
+		cube.position.y = -10;
+		cube.isVisible = true;
+		cube.scaling = new BABYLON.Vector3(2.1, 2.1, 2.1);
+		cube.receiveShadows = true;
+		cube.material = materials.gray;
+		self.shadowGenerator.getShadowMap().renderList.push(cube);
+
+		powerUpLimit = meshes[0].clone();
+		powerUpLimit.material = materials.blue;
+		powerUpLimit.position.y = -15;
+		powerUpLimit.powerUpEffect = function (player) {
+			player.limit += 1;
+		};
+		self.availablePowerUps.push(powerUpLimit);
+
+		powerUpRange = meshes[0].clone();
+		powerUpRange.material = materials.yellow;
+		powerUpRange.position.y = -20;
+		powerUpRange.powerUpEffect = function (player) {
+			player.range += 5;
+		};
+		self.availablePowerUps.push(powerUpRange);
+
+		self.createMap(cube, fixedBox);
+
+	});
+
+	this.createMap = function(box, fixedBox) {
+		// TODO use a grid system to place boxes and handle their state
+		for (var y = -5; y < map.height - 10; y++) {
+			for (var x = -5; x < map.width - 10; x++) {
+				if (x % 5 == 0 && y % 5 == 0) {
+					if ((x % 10 != 0 || y % 10 != 0) && Math.random() < 0.2) {
+						var newBoxPosition = new BABYLON.Vector3(x + 10 - map.width / 2, 3, y + 10 - map.height / 2);
+						var name = "cube-x" + x + "y" + y;
+						new Box(scene, newBoxPosition, box, name, self.shadowGenerator, self.availablePowerUps, players);
+					}
+					if (x % 10 == 0 && y % 10 == 0) {
+						var fixedBoxInstance = fixedBox.createInstance("x" + x + "y" + y);
+						fixedBoxInstance.position = new BABYLON.Vector3(x + 10 - map.width / 2, 2.5, y + 10 - map.height / 2);
+						fixedBoxInstance.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {
+							mass: 0,
+							friction: 0,
+							restitution: 0.1
+						});
+						fixedBoxInstance.applyGravity = true;
+						fixedBoxInstance.receiveShadows = true;
+						fixedBoxInstance.isFixedBox = true;
+						self.shadowGenerator.getShadowMap().renderList.push(fixedBoxInstance);
+					}
+				}
+			}
+		}
+	};
+
+	this.update = function () {
+		// move players
+		for (var i = 0; i < players.length; i++) {
+			players[i].move();
+		}
+
+		// move light
+		self.light.position.x = Math.sin(new Date().getTime() / 10000) * 60;
+		self.light.position.z = Math.cos(new Date().getTime() / 10000) * 60;
+		self.light.setDirectionToTarget(new BABYLON.Vector3(0, 0, 0));
+
+	};
+
+	/* KEYBOARD */
+	window.addEventListener("keyup", function (evt) {
+		handleKeyUp(evt.keyCode);
+	});
+
+	window.addEventListener("keydown", function (evt) {
+		handleKeyDown(evt.keyCode);
+	});
+
+	// TODO put in config file and make available for dynamic configuration
+	DIRECTIONS = {
+		// WASD
+		PLAYER0: {
+			TOP: 87,
+			BOT: 83,
+			LEFT: 65,
+			RIGHT: 68,
+			BOMB: 32
+		},
+		// NUMPAD
+		PLAYER1: {
+			TOP: 104,
+			BOT: 101,
+			LEFT: 100,
+			RIGHT: 102,
+			BOMB: 96
+		}
+	};
+
+	// TODO put in controller class??
+	var handleKeyDown = function (keycode) {
+		for (var i = 0; i < players.length; i++) {
+			if(DIRECTIONS['PLAYER'+i]) {
+				switch (keycode) {
+					case DIRECTIONS['PLAYER' + i].TOP :
+						players[i].chooseDirection(0, 1);
+						break;
+					case DIRECTIONS['PLAYER' + i].BOT :
+						players[i].chooseDirection(1, 1);
+						break;
+					case DIRECTIONS['PLAYER' + i].LEFT :
+						players[i].chooseDirection(2, 1);
+						break;
+					case DIRECTIONS['PLAYER' + i].RIGHT :
+						players[i].chooseDirection(3, 1);
+						break;
+					case DIRECTIONS['PLAYER' + i].BOMB:
+						players[i].placeBomb(self.bombs, materials.black, players, self.shadowGenerator);
+						break;
+				}
+			}
+		}
+	};
+
+	// TODO put in controller class??
+	var handleKeyUp = function (keycode) {
+		for (var i = 0; i < players.length; i++) {
+			if(DIRECTIONS['PLAYER'+i]) {
+				switch (keycode) {
+					case DIRECTIONS['PLAYER' + i].TOP :
+						players[i].chooseDirection(0, 0);
+						break;
+					case DIRECTIONS['PLAYER' + i].BOT :
+						players[i].chooseDirection(1, 0);
+						break;
+					case DIRECTIONS['PLAYER' + i].LEFT :
+						players[i].chooseDirection(2, 0);
+						break;
+					case DIRECTIONS['PLAYER' + i].RIGHT :
+						players[i].chooseDirection(3, 0);
+						break;
+				}
+			}
+		}
+	};
+
+	/* GAMEPADS */
+	// TODO put in controller class??
+	var gamepadConnected = function (gamepad) {
+		// since the first 2 players are controlled by the keyboard start with the third player
+		var playerIndex = gamepad.index + 2;
+		var player = players[playerIndex];
+
+		console.log(navigator.getGamepads(), playerIndex);
+
+		if(player){
+			// TODO somehow use DIRECTIONS configuration to create dynamically configurable controls
+			gamepad.onleftstickchanged(function (values) {
+				if (Math.round(values.y) < 0)
+					player.chooseDirection(0, 1);
+				if (Math.round(values.y) > 0)
+					player.chooseDirection(1, 1);
+				if (Math.round(values.x) < 0)
+					player.chooseDirection(2, 1);
+				if (Math.round(values.x) > 0)
+					player.chooseDirection(3, 1);
+
+				if (Math.round(values.y) == 0) {
+					player.chooseDirection(0, 0);
+					player.chooseDirection(1, 0);
+				}
+				if (Math.round(values.x) == 0) {
+					player.chooseDirection(2, 0);
+					player.chooseDirection(3, 0);
+				}
+			});
+
+			gamepad.onbuttondown(function (buttonIndex) {
+				player.placeBomb(self.bombs, materials.black, players, shadowGenerator);
+			});
+
+			gamepad.onbuttonup(function (buttonIndex) {
+			});
+		}
+
+	};
+
+	var gamepads = new BABYLON.Gamepads(gamepadConnected);
 
 };

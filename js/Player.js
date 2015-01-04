@@ -11,9 +11,9 @@ var Player = function(name, material, spawnPosition, scene){
 	});
 	this.avatar.material = material;
 	this.avatar.receiveShadows = true;
-	this.avatar.playerForThisBombAvatar = this;
+	this.avatar.playerForThisBomb = this;
 
-	// playerForThisBombAvatar stats
+	// playerForThisBomb stats
 	this.name = name;
 	this.isDead = false;
 	this.speed = 3;
@@ -82,7 +82,7 @@ var Player = function(name, material, spawnPosition, scene){
 	};
 
 	this.die = function(players){
-		// kill playerForThisBombAvatar
+		// kill playerForThisBomb
 		self.isDead = true;
 		self.avatar.dispose();
 		// check remaining players
