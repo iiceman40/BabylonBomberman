@@ -26,8 +26,9 @@ var Game = function (scene, map, materials, players) {
 
 	// shadows for players
 	for(var i=0; i<players.length; i++){
-		// TODO move adding players to game object
-		self.shadowGenerator.getShadowMap().renderList.push(players[i].avatar);
+		for(var j=0; j<players[i].bodyParts.length; j++) {
+			self.shadowGenerator.getShadowMap().renderList.push(players[i].bodyParts[j]);
+		}
 	}
 
 
@@ -158,9 +159,13 @@ var Game = function (scene, map, materials, players) {
 			function (player) {
 				console.log('random effect 4 - invisible');
 				player.startInfection();
-				player.avatar.visibility = 0.01;
+				for(var i=0; i<player.bodyParts.length; i++){
+					player.bodyParts[i].visibility = 0.01;
+				}
 				setTimeout(function(){
-					player.avatar.visibility = 1;
+					for(var i=0; i<player.bodyParts.length; i++){
+						player.bodyParts[i].visibility = 1;
+					}
 					player.stopInfection();
 				}, 10000);
 			},
@@ -205,17 +210,17 @@ var Game = function (scene, map, materials, players) {
 						new Box(scene, newBoxPosition, box, name, self.shadowGenerator, self.availablePowerUps, players);
 					}
 					if (x % 10 == 0 && y % 10 == 0) {
-						var fixedBoxInstance = fixedBox.createInstance("x" + x + "y" + y);
-						fixedBoxInstance.position = new BABYLON.Vector3(x + 10 - map.width / 2, 2.5, y + 10 - map.height / 2);
-						fixedBoxInstance.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {
+						var fixedBoxClone = fixedBox.clone(); //.createInstance("x" + x + "y" + y);
+						fixedBoxClone.position = new BABYLON.Vector3(x + 10 - map.width / 2, 2.5, y + 10 - map.height / 2);
+						fixedBoxClone.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {
 							mass: 0,
 							friction: 0.001,
 							restitution: 0.001
 						});
-						fixedBoxInstance.applyGravity = true;
-						fixedBoxInstance.receiveShadows = true;
-						fixedBoxInstance.isFixedBox = true;
-						self.shadowGenerator.getShadowMap().renderList.push(fixedBoxInstance);
+						fixedBoxClone.applyGravity = true;
+						fixedBoxClone.receiveShadows = true;
+						fixedBoxClone.isFixedBox = true;
+						self.shadowGenerator.getShadowMap().renderList.push(fixedBoxClone);
 					}
 				}
 			}

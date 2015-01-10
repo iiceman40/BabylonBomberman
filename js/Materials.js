@@ -6,6 +6,10 @@ var Materials = function(scene) {
 	this.gray.diffuseColor = BABYLON.Color3.FromInts(115, 135, 155);
 	this.gray.specularPower = 1000;
 
+	this.greenCute = new BABYLON.StandardMaterial("green", scene);
+	this.greenCute.diffuseTexture = new BABYLON.Texture("textures/bman_v1_texture.png", scene);
+	this.greenCute.diffuseTexture.vOffset = 0.25;
+
 	this.green = new BABYLON.StandardMaterial("green", scene);
 	this.green.diffuseColor = BABYLON.Color3.Green();
 

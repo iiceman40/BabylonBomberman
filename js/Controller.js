@@ -35,8 +35,14 @@ $(document).ready(function () {
 		materials.red,
 		materials.yellow
 	];
+	var playerHeadMaterials = [
+		materials.greenCute,
+		materials.blue,
+		materials.red,
+		materials.yellow
+	];
 	for (var i = 0; i < Math.min( parseInt(QueryString.players), 4 ); i++) {
-		players.push(new Player('Player' + (i+1), playerMaterials[i], playerStartPositions[i], scene, materials.glowingPurple));
+		players.push(new Player('Player' + (i+1), playerMaterials[i], playerHeadMaterials[i], playerStartPositions[i], scene, materials.glowingPurple, camera));
 	}
 
 	/* GAME */

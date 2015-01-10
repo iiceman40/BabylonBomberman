@@ -1,10 +1,10 @@
-var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, shadowGenerator) {
+var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, shadowGenerator, camera) {
 	var self = this;
 
 	this.isExploding = false;
 	this.playerForThisBomb = player;
 	this.timer = setTimeout(function () {
-		self.explode(bombs, players);
+		self.explode();
 	}, 3000);
 
 	var bombAvatar = BABYLON.Mesh.CreateSphere("bomb", 16, 4, scene);
@@ -47,8 +47,9 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 	/*
 	 * METHODS
 	 */
-	this.explode = function (bombs, players) {
+	this.explode = function () {
 		self.isExploding = true;
+		self.avatar.visibility = 0;
 		clearTimeout(this.timer);
 
 		var bombRange = this.playerForThisBomb.range;
@@ -63,6 +64,19 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 		rayOfFireRight.start();
 		rayOfFireTop.start();
 		rayOfFireBottom.start();
+
+		// camera shake animation
+		var animationCameraShake = new BABYLON.Animation("cameraShakeAnimation", "target", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		var keyFramesCameraShake = [
+			{frame: 0, value: new BABYLON.Vector3(0, 0, 0)},
+			{frame: 3, value: new BABYLON.Vector3(1, -1, 1)},
+			{frame: 6, value: new BABYLON.Vector3(-1, 0, 1)},
+			{frame: 9, value: new BABYLON.Vector3(1, 1, -1)},
+			{frame: 12, value: new BABYLON.Vector3(0, 0, 0)}
+		];
+		animationCameraShake.setKeys(keyFramesCameraShake);
+		camera.animations.push(animationCameraShake);
+		scene.beginAnimation(camera, 0, 20, true);
 
 		setTimeout(function () {
 			rayOfFireLeft.stop();
