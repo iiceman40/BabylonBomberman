@@ -1,0 +1,39 @@
+<div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	<h4 class="modal-title align-center">Please Log In, or Sign Up</h4>
+</div>
+
+<div class="modal-body">
+	<div class="row">
+		<div class="col-xs-6 col-sm-6 col-md-6">
+			<a href="#" class="btn btn-lg btn-primary btn-block">Facebook</a>
+		</div>
+		<div class="col-xs-6 col-sm-6 col-md-6">
+			<a href="#" class="btn btn-lg btn-primary btn-block">Google</a>
+		</div>
+	</div>
+	<div class="login-or">
+		<hr class="hr-or">
+		<div class="span-or align-center">or</div>
+	</div>
+	<iframe id="remember" name="remember" class="hidden" src="blank.php"></iframe>
+	<form role="form" target="remember" method="post" autocomplete="on" id="loginForm">
+		<div class="form-group">
+			<label for="inputEmail">Email address</label>
+			<input data-bind="value: email" type="email" class="form-control" id="inputEmail" />
+		</div>
+		<div class="form-group">
+			<a class="pull-right" href="#">Forgot password?</a>
+			<label for="inputPassword">Password</label>
+			<input data-bind="value: password" type="password" class="form-control" id="inputPassword" />
+		</div>
+		<input type="hidden" data-bind="value: currentPlayer" />
+		<button type="submit" class="hidden"></button>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
+	<button data-bind="click: signup" type="button" class="btn btn-primary" id="signUpBtn"><span class="glyphicon glyphicon-pencil"></span> Sign Up</button>
+	<button data-bind="click: login" type="button" class="btn btn-info" id="logInBtn"><span class="glyphicon glyphicon-log-in"></span> Log In</button>
+</div>

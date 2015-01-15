@@ -1,0 +1,43 @@
+<div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	<h4 class="modal-title align-center">Your Profile</h4>
+</div>
+<div class="modal-body">
+	<div class="row">
+		<div class="col-sm-5">
+			Current Player Name:
+		</div>
+		<div class="col-sm-7">
+			<input type="text" class="form-control" data-bind="value: players()[currentPlayer()].name"/><br/>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-5">
+			Email:
+		</div>
+		<div class="col-sm-7">
+			<input type="text" class="form-control" data-bind="value: players()[currentPlayer()].email"/><br/>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-5">
+			Change Password:
+		</div>
+		<div class="col-sm-7">
+			<input type="password" class="form-control" id="setNewPassword" placeholder="Enter new password"/><br>
+			<input type="password" class="form-control" id="confirmNewPassword" placeholder="Confirm the new password"/><br>
+		</div>
+	</div>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-default pull-left" data-dismiss="modal"><span
+			class="glyphicon glyphicon-log-out"></span> Log Out
+	</button>
+	<button type="button" class="btn btn-default" data-dismiss="modal"><span
+			class="glyphicon glyphicon-remove"></span> Close
+	</button>
+	<button data-bind="" type="button" class="btn btn-primary" id="saveProfile"><span
+			class="glyphicon glyphicon-save"></span> Save Changes
+	</button>
+</div>

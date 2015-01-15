@@ -1,0 +1,26 @@
+<div class="col-sm-6 player" data-bind="css: 'player'+$index()">
+
+	<!-- ko ifnot: $data.active -->
+		<button class="btn-primary playerBtn" data-bind="click: togglePlayer">
+			<span class="glyphicon glyphicon-plus"></span>
+		</button>
+	<!-- /ko -->
+
+	<!-- ko if: $data.active -->
+
+		<button class="playerBtn" data-bind="click: togglePlayer, css: 'btn-' + color()">
+			<img data-bind="attr: {src: 'images/' + avatar() + '.svg'}"/>
+		</button>
+
+		<a href="#loginModal" class="login" data-toggle="modal" data-bind="click: $root.setCurrentPlayer">
+			<span class="glyphicon glyphicon-log-in" data-bind="visible: !$data.loggedin()" data-tooltip="tooltip" data-placement="left" title="Login or Sign Up"></span>
+			<span class="glyphicon glyphicon-user" data-bind="visible: $data.loggedin()" data-tooltip="tooltip" data-placement="left" title="Edit profile"></span>
+		</a>
+
+		<span class="form-group">
+			<input class="playerName form-control" data-bind="value: $data.name, hasfocus: $data.name.focused"/>
+		</span>
+
+	<!-- /ko -->
+
+</div>

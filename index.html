@@ -2,24 +2,82 @@
 <html>
 <head>
 	<title>Babylon Bomberman</title>
+	<link rel="stylesheet" type="text/css" href="js/Libraries/bootstrap/css/bootstrap.min.css"/>
+	<link href="//netdna.bootstrapcdn.com/bootswatch/3.1.0/slate/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<!-- Libraries -->
-	<script src="js/libs/jquery-2.1.1.min.js"></script>
-	<script src="js/libs/babylon.2.0-alpha.debug.js"></script>
-	<script src="js/libs/Oimo.js"></script>
+	<script src="js/Libraries/jquery-2.1.1.min.js"></script>
+	<script src="js/Libraries/babylon.2.0-alpha.debug.js"></script>
+	<script src="js/Libraries/Oimo.js"></script>
+	<script src="js/Libraries/knockout-3.2.0.min.js"></script>
+	<script src="js/Libraries/bootstrap/js/bootstrap.min.js"></script>
 	<!-- Classes -->
-	<script src="js/Materials.js"></script>
-	<script src="js/Game.js"></script>
-	<script src="js/Box.js"></script>
-	<script src="js/Player.js"></script>
-	<script src="js/Bomb.js"></script>
-	<script src="js/PowerUp.js"></script>
+	<script src="js/Classes/Materials.js"></script>
+	<script src="js/Classes/Controls.js"></script>
+	<script src="js/Classes/Arena.js"></script>
+	<script src="js/Classes/Game.js"></script>
+	<script src="js/Classes/Box.js"></script>
+	<script src="js/Classes/Player.js"></script>
+	<script src="js/Classes/Bomb.js"></script>
+	<script src="js/Classes/PowerUp.js"></script>
 	<!-- Controller -->
-	<script src="js/Controller.js"></script>
+	<script src="js/Controller/match.js"></script>
+	<script src="js/Controller/menu.js"></script>
 </head>
 <body>
 
-<canvas id="renderCanvas"></canvas>
-<div id="stats"></div>
+	<!-- Menu UI -->
+	<div class="container" data-bind="visible: !gameRunning()">
+
+		<h1>Bomberman <small>alpha v0.1</small></h1>
+
+		<!-- Players -->
+		<div data-bind="template: {name: 'player-template', foreach: players}" class="row"></div>
+
+		<!-- Play Menu -->
+		<div class="play-menu">
+			<form action="#" method="get" id="startGame">
+				<!-- Game Options Start -->
+				<input type="hidden" name="numberOfPlayers" data-bind="value: numberOfPlayers()"/>
+				<input type="hidden" name="matchesToWin" data-bind="value: matchesToWin()"/>
+				<input type="hidden" name="sound" data-bind="value: sound()"/>
+
+				<div data-bind="if: players()[0].active"><input type="hidden" name="namePlayer0" data-bind="value: players()[0].name"/></div>
+				<div data-bind="if: players()[1].active"><input type="hidden" name="namePlayer1" data-bind="value: players()[1].name"/></div>
+				<div data-bind="if: players()[2].active"><input type="hidden" name="namePlayer2" data-bind="value: players()[2].name"/></div>
+				<div data-bind="if: players()[3].active"><input type="hidden" name="namePlayer3" data-bind="value: players()[3].name"/></div>
+
+				<!-- Game Options End -->
+				<button type="submit" data-bind="visible: numberOfPlayers() > 0, click: startGame" class="play-button btn-default">
+					<span class="glyphicon glyphicon-play"></span><br/>
+					<span data-bind="text: numberOfPlayers"></span> Player(s)
+				</button>
+			</form>
+			<span class="option wins" data-bind="click: addMatchesToWin" data-toggle="tooltip" data-placement="top" title="Number of matches to win for victory">
+				<span class="glyphicon glyphicon-glass"></span> <span class="matchesToWin" data-bind="text: matchesToWin()"></span>
+			</span>
+			<span class="option sound" data-bind="click: toggleSound" data-toggle="tooltip" data-placement="left" title="Sound on/off">
+				<span class="glyphicon" data-bind="css: {'glyphicon-volume-down': sound, 'glyphicon-volume-off': !sound()}"></span>
+			</span>
+		</div>
+
+	</div>
+
+	<!-- Babylon -->
+	<canvas id="renderCanvas"></canvas>
+	<div id="stats"></div>
+
+	<!-- Templates -->
+	<div id="templates" style="display:none"></div>
+
+	<!-- modal for login -->
+	<div class="modal fade" id="loginModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div data-bind="template: { name: getModalTemplate }"></div>
+			</div>
+		</div>
+	</div>
+
 </body>
 </html>
