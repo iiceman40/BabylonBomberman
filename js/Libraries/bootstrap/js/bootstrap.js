@@ -228,15 +228,15 @@ if (typeof jQuery === 'undefined') {
     if ($parent.length) {
       var $input = this.$element.find('input')
       if ($input.prop('type') == 'radio') {
-        if ($input.prop('checked') && this.$element.hasClass('active')) changed = false
-        else $parent.find('.active').removeClass('active')
+        if ($input.prop('checked') && this.$element.hasClass('isActive')) changed = false
+        else $parent.find('.isActive').removeClass('isActive')
       }
-      if (changed) $input.prop('checked', !this.$element.hasClass('active')).trigger('change')
+      if (changed) $input.prop('checked', !this.$element.hasClass('isActive')).trigger('change')
     } else {
-      this.$element.attr('aria-pressed', !this.$element.hasClass('active'))
+      this.$element.attr('aria-pressed', !this.$element.hasClass('isActive'))
     }
 
-    if (changed) this.$element.toggleClass('active')
+    if (changed) this.$element.toggleClass('isActive')
   }
 
 
@@ -367,7 +367,7 @@ if (typeof jQuery === 'undefined') {
 
   Carousel.prototype.to = function (pos) {
     var that        = this
-    var activeIndex = this.getItemIndex(this.$active = this.$element.find('.item.active'))
+    var activeIndex = this.getItemIndex(this.$active = this.$element.find('.item.isActive'))
 
     if (pos > (this.$items.length - 1) || pos < 0) return
 
@@ -401,7 +401,7 @@ if (typeof jQuery === 'undefined') {
   }
 
   Carousel.prototype.slide = function (type, next) {
-    var $active   = this.$element.find('.item.active')
+    var $active   = this.$element.find('.item.isActive')
     var $next     = next || this.getItemForDirection(type, $active)
     var isCycling = this.interval
     var direction = type == 'next' ? 'left' : 'right'
@@ -413,7 +413,7 @@ if (typeof jQuery === 'undefined') {
       $next = this.$element.find('.item')[fallback]()
     }
 
-    if ($next.hasClass('active')) return (this.sliding = false)
+    if ($next.hasClass('isActive')) return (this.sliding = false)
 
     var relatedTarget = $next[0]
     var slideEvent = $.Event('slide.bs.carousel', {
@@ -428,9 +428,9 @@ if (typeof jQuery === 'undefined') {
     isCycling && this.pause()
 
     if (this.$indicators.length) {
-      this.$indicators.find('.active').removeClass('active')
+      this.$indicators.find('.isActive').removeClass('isActive')
       var $nextIndicator = $(this.$indicators.children()[this.getItemIndex($next)])
-      $nextIndicator && $nextIndicator.addClass('active')
+      $nextIndicator && $nextIndicator.addClass('isActive')
     }
 
     var slidEvent = $.Event('slid.bs.carousel', { relatedTarget: relatedTarget, direction: direction }) // yes, "slid"
@@ -441,8 +441,8 @@ if (typeof jQuery === 'undefined') {
       $next.addClass(direction)
       $active
         .one('bsTransitionEnd', function () {
-          $next.removeClass([type, direction].join(' ')).addClass('active')
-          $active.removeClass(['active', direction].join(' '))
+          $next.removeClass([type, direction].join(' ')).addClass('isActive')
+          $active.removeClass(['isActive', direction].join(' '))
           that.sliding = false
           setTimeout(function () {
             that.$element.trigger(slidEvent)
@@ -450,8 +450,8 @@ if (typeof jQuery === 'undefined') {
         })
         .emulateTransitionEnd(Carousel.TRANSITION_DURATION)
     } else {
-      $active.removeClass('active')
-      $next.addClass('active')
+      $active.removeClass('isActive')
+      $next.addClass('isActive')
       this.sliding = false
       this.$element.trigger(slidEvent)
     }
@@ -2035,9 +2035,9 @@ if (typeof jQuery === 'undefined') {
       selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
     }
 
-    if ($this.parent('li').hasClass('active')) return
+    if ($this.parent('li').hasClass('isActive')) return
 
-    var $previous = $ul.find('.active:last a')
+    var $previous = $ul.find('.isActive:last a')
     var hideEvent = $.Event('hide.bs.tab', {
       relatedTarget: $this[0]
     })
@@ -2066,22 +2066,22 @@ if (typeof jQuery === 'undefined') {
   }
 
   Tab.prototype.activate = function (element, container, callback) {
-    var $active    = container.find('> .active')
+    var $active    = container.find('> .isActive')
     var transition = callback
       && $.support.transition
       && (($active.length && $active.hasClass('fade')) || !!container.find('> .fade').length)
 
     function next() {
       $active
-        .removeClass('active')
-        .find('> .dropdown-menu > .active')
-          .removeClass('active')
+        .removeClass('isActive')
+        .find('> .dropdown-menu > .isActive')
+          .removeClass('isActive')
         .end()
         .find('[data-toggle="tab"]')
           .attr('aria-expanded', false)
 
       element
-        .addClass('active')
+        .addClass('isActive')
         .find('[data-toggle="tab"]')
           .attr('aria-expanded', true)
 
@@ -2095,7 +2095,7 @@ if (typeof jQuery === 'undefined') {
       if (element.parent('.dropdown-menu')) {
         element
           .closest('li.dropdown')
-            .addClass('active')
+            .addClass('isActive')
           .end()
           .find('[data-toggle="tab"]')
             .attr('aria-expanded', true)

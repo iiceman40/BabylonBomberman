@@ -3,6 +3,7 @@
 	height: 100%;
 	margin: 0;
 	padding: 0;
+	position: fixed;
 }
 
 #stats {
@@ -135,7 +136,7 @@ h1 small {
 	height: 300px;
 	width: 300px;
 	position: absolute;
-	top: 54%;
+	top: 57%;
 	left: 50%;
 	margin-top: -150px;
 	margin-left: -150px;
@@ -179,4 +180,65 @@ h1 small {
 	top: 50%;
 	left: 5%;
 	margin-top: -35px;
+}
+
+.playerConfig {
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	position: absolute;
+	text-align: center;
+}
+.removePlayer {
+	position: absolute;
+	font-size: 2em;
+}
+.player0 .removePlayer{
+	top: 1em;
+	left: 1em;
+}
+.player1 .removePlayer {
+	top: 1em;
+	right: 1em;
+}
+.player2 .removePlayer{
+	bottom: 1em;
+	left: 1em;
+}
+.player3 .removePlayer {
+	bottom: 1em;
+	right: 1em;
+}
+
+.avatarSelection{
+	margin-top: 10%;
+}
+.avatarSelection .btn:focus {
+	outline: none;
+}
+.avatarSelection .glyphicon {
+	font-size: 4em;
+}
+.avatarSelection .glyphicon-chevron-right {
+	margin-left: 3em;
+}
+.avatarSelection .glyphicon-chevron-left {
+	margin-right: 3em;
+}
+
+.colorSelection{
+	margin-top: 10%;
+}
+.colorSelection .btn:focus {
+	outline: none;
+}
+.colorSelection .glyphicon {
+	font-size: 2em;
+}
+.colorSelection .glyphicon-chevron-right {
+	margin-left: 3em;
+}
+.colorSelection .glyphicon-chevron-left {
+	margin-right: 3em;
 }

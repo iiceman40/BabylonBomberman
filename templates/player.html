@@ -1,25 +1,37 @@
 <div class="col-sm-6 player" data-bind="css: 'player'+$index()">
 
-	<!-- ko ifnot: $data.active -->
-		<button class="btn-primary playerBtn" data-bind="click: togglePlayer">
-			<span class="glyphicon glyphicon-plus"></span>
-		</button>
+	<!-- ko ifnot: $data.isActive -->
+	<button class="btn-primary playerBtn" data-bind="click: togglePlayer">
+		<span class="glyphicon glyphicon-plus"></span>
+	</button>
 	<!-- /ko -->
 
-	<!-- ko if: $data.active -->
+	<!-- ko if: $data.isActive -->
 
-		<button class="playerBtn" data-bind="click: togglePlayer, css: 'btn-' + color()">
-			<img data-bind="attr: {src: 'images/' + avatar() + '.svg'}"/>
-		</button>
+	<button class="playerBtn" data-bind="css: 'btn-' + color()">
+		<img data-bind="attr: {src: 'images/' + avatar() + '.svg'}"/>
+	</button>
 
-		<a href="#loginModal" class="login" data-toggle="modal" data-bind="click: $root.setCurrentPlayer">
-			<span class="glyphicon glyphicon-log-in" data-bind="visible: !$data.loggedin()" data-tooltip="tooltip" data-placement="left" title="Login or Sign Up"></span>
-			<span class="glyphicon glyphicon-user" data-bind="visible: $data.loggedin()" data-tooltip="tooltip" data-placement="left" title="Edit profile"></span>
-		</a>
+	<a href="#loginModal" class="login" data-toggle="modal" data-bind="click: $root.setCurrentPlayer">
+		<span class="glyphicon glyphicon-log-in" data-bind="visible: !$data.loggedin()" data-tooltip="tooltip" data-placement="left" title="Login or Sign Up"></span>
+		<span class="glyphicon glyphicon-user" data-bind="visible: $data.loggedin()" data-tooltip="tooltip" data-placement="left" title="Edit profile"></span>
+	</a>
 
-		<span class="form-group">
-			<input class="playerName form-control" data-bind="value: $data.name, hasfocus: $data.name.focused"/>
-		</span>
+	<span class="form-group">
+		<input class="playerName form-control" data-bind="value: $data.name, hasfocus: $data.name.focused"/>
+	</span>
+
+	<div class="playerConfig">
+		<div class="colorSelection">
+			<button data-bind="click: prevColor" class="btn btn-link" data-tooltip="tooltip"><i class="glyphicon glyphicon-chevron-left"></i></button>
+			<button data-bind="click: nextColor" class="btn btn-link"><i class="glyphicon glyphicon-chevron-right"></i></button>
+		</div>
+		<div class="avatarSelection">
+			<button data-bind="click: prevAvatar" class="btn btn-link"><i class="glyphicon glyphicon-chevron-left"></i></button>
+			<button data-bind="click: nextAvatar" class="btn btn-link"><i class="glyphicon glyphicon-chevron-right"></i></button>
+		</div>
+		<button data-bind="click: togglePlayer" class="btn btn-link removePlayer"><i class="glyphicon glyphicon-remove"></i></button>
+	</div>
 
 	<!-- /ko -->
 

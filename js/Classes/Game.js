@@ -68,6 +68,10 @@ var Game = function (scene, map, materials, camera, numberOfPlayers) {
 		self.createGroundAndWalls();
 		self.initPlayers();
 		self.flyCameraToPosition();
+
+		//self.addRamp(0,2,5);
+
+		var controls = new Controls(self.players, materials, self.bombs, self.shadowGenerator);
 	};
 
 
@@ -75,6 +79,13 @@ var Game = function (scene, map, materials, camera, numberOfPlayers) {
 	/*
 	 * METHODS
 	 */
+	this.update = function () {
+		// move self.players
+		for (var i = 0; i < self.players.length; i++) {
+			self.players[i].move();
+		}
+	};
+
 	this.initLightAndShadow = function(){
 		/* LIGHT */
 		this.light = new BABYLON.DirectionalLight("light", new BABYLON.Vector3(0, 0, 0), scene);
@@ -84,7 +95,7 @@ var Game = function (scene, map, materials, camera, numberOfPlayers) {
 			-40
 		);
 		this.light.setDirectionToTarget(new BABYLON.Vector3(0, 0, 0));
-		this.light.intensity = 0.6;
+		this.light.intensity = 0.4;
 		this.light.range = 5000;
 		this.lightBulb = BABYLON.Mesh.CreateSphere("lightBulb", 16, 4, scene);
 		this.lightBulb.position = this.light.position;
@@ -143,7 +154,7 @@ var Game = function (scene, map, materials, camera, numberOfPlayers) {
 		animationCameraAngle2.setEasingFunction(easingFunction);
 
 		// TODO better not use a global variable??
-		cameraAnimateable = scene.beginAnimation(camera, 20, 240, false, 1, function(){
+		cameraAnimateable = scene.beginAnimation(camera, 239, 240, false, 1, function(){
 			console.log('DEBUG - animation ended');
 			camera.animations = [];
 		});
@@ -193,14 +204,15 @@ var Game = function (scene, map, materials, camera, numberOfPlayers) {
 		//this.wallRight.receiveShadows = true;
 		//this.shadowGenerator.getShadowMap().renderList.push(this.wallRight);
 		this.wallRight.visibility = 0.3;
+
 	};
 
 	this.initPlayers = function(){
 		playerStartPositions = [
 			new BABYLON.Vector3(-map.width / 2 + 5, 10, map.height / 2 - 5),
-			new BABYLON.Vector3(map.width / 2 - 5, 10, -map.height / 2 + 5),
+			new BABYLON.Vector3(map.width / 2 - 5, 10, map.height / 2 - 5),
 			new BABYLON.Vector3(-map.width / 2 + 5, 10, -map.height / 2 + 5),
-			new BABYLON.Vector3(map.width / 2 - 5, 10, map.height / 2 - 5)
+			new BABYLON.Vector3(map.width / 2 - 5, 10, -map.height / 2 + 5)
 		];
 		var playerMaterials = [
 			materials.green,
@@ -341,9 +353,9 @@ var Game = function (scene, map, materials, camera, numberOfPlayers) {
 					}
 					if (x % 10 == 0 && y % 10 == 0) {
 						var fixedBoxClone = fixedBox.createInstance("x" + x + "y" + y);
-						fixedBoxClone.position = new BABYLON.Vector3(x + 10 - map.width / 2, 2.5, y + 10 - map.height / 2);
+						fixedBoxClone.position = new BABYLON.Vector3(x + 10 - map.width / 2, 5, y + 10 - map.height / 2);
 						fixedBoxClone.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {
-							mass: 0,
+							mass: 100000000,
 							friction: 0.001,
 							restitution: 0.001
 						});
@@ -355,134 +367,31 @@ var Game = function (scene, map, materials, camera, numberOfPlayers) {
 				}
 			}
 		}
+
+		/*
+		TODO add ramps to the map??
+		var box1 = BABYLON.Mesh.CreateBox("box1", 3, scene);
+		box1.position.y = 3;
+		box1.position.x = -5;
+		box1.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {
+			mass: 1000000,
+			friction: 1,
+			restitution: 0.00001
+		});
+
+		var box2 = BABYLON.Mesh.CreateBox("box1", 5, scene);
+		box2.scaling.z = 2.2;
+		box2.scaling.y = 0.05;
+		box2.position.y = 3.5;
+		box2.position.x = -5;
+		box2.position.z = 3;
+		//box1.rotate(BABYLON.Axis.Z, .5, BABYLON.Space.LOCAL);
+		box2.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {
+			mass: 1000000,
+			friction: 0.5,
+			restitution: 0.00001
+		});
+		*/
 	};
-
-	this.update = function () {
-		// move self.players
-		for (var i = 0; i < self.players.length; i++) {
-			self.players[i].move();
-		}
-	};
-
-	/* KEYBOARD */
-	window.addEventListener("keyup", function (evt) {
-		handleKeyUp(evt.keyCode);
-	});
-
-	window.addEventListener("keydown", function (evt) {
-		handleKeyDown(evt.keyCode);
-	});
-
-	// TODO put in config file and make available for dynamic configuration
-	DIRECTIONS = {
-		// WASD
-		PLAYER0: {
-			TOP: 87,
-			BOT: 83,
-			LEFT: 65,
-			RIGHT: 68,
-			BOMB: 32
-		},
-		// NUMPAD
-		PLAYER1: {
-			TOP: 104,
-			BOT: 101,
-			LEFT: 100,
-			RIGHT: 102,
-			BOMB: 96
-		}
-	};
-
-	// TODO put in controller class??
-	var handleKeyDown = function (keycode) {
-		for (var i = 0; i < self.players.length; i++) {
-			if(DIRECTIONS['PLAYER'+i]) {
-				switch (keycode) {
-					case DIRECTIONS['PLAYER' + i].TOP :
-						self.players[i].chooseDirection(0, 1);
-						break;
-					case DIRECTIONS['PLAYER' + i].BOT :
-						self.players[i].chooseDirection(1, 1);
-						break;
-					case DIRECTIONS['PLAYER' + i].LEFT :
-						self.players[i].chooseDirection(2, 1);
-						break;
-					case DIRECTIONS['PLAYER' + i].RIGHT :
-						self.players[i].chooseDirection(3, 1);
-						break;
-					case DIRECTIONS['PLAYER' + i].BOMB:
-						self.players[i].placeBomb(self.bombs, materials.black, self.players, self.shadowGenerator);
-						break;
-				}
-			}
-		}
-	};
-
-	// TODO put in controller class??
-	var handleKeyUp = function (keycode) {
-		for (var i = 0; i < self.players.length; i++) {
-			if(DIRECTIONS['PLAYER'+i]) {
-				switch (keycode) {
-					case DIRECTIONS['PLAYER' + i].TOP :
-						self.players[i].chooseDirection(0, 0);
-						break;
-					case DIRECTIONS['PLAYER' + i].BOT :
-						self.players[i].chooseDirection(1, 0);
-						break;
-					case DIRECTIONS['PLAYER' + i].LEFT :
-						self.players[i].chooseDirection(2, 0);
-						break;
-					case DIRECTIONS['PLAYER' + i].RIGHT :
-						self.players[i].chooseDirection(3, 0);
-						break;
-				}
-			}
-		}
-	};
-
-	/* GAMEPADS */
-	// TODO put in controller class??
-	var gamepadConnected = function (gamepad) {
-		// since the first 2 self.players are controlled by the keyboard start with the third player
-		var playerIndex = gamepad.index + 2;
-		var player = self.players[playerIndex];
-
-		console.log(navigator.getGamepads(), playerIndex);
-
-		if(player){
-			// TODO somehow use DIRECTIONS configuration to create dynamically configurable controls
-			gamepad.onleftstickchanged(function (values) {
-				if (Math.round(values.y) < 0)
-					player.chooseDirection(0, 1);
-				if (Math.round(values.y) > 0)
-					player.chooseDirection(1, 1);
-				if (Math.round(values.x) < 0)
-					player.chooseDirection(2, 1);
-				if (Math.round(values.x) > 0)
-					player.chooseDirection(3, 1);
-
-				if (Math.round(values.y) == 0) {
-					player.chooseDirection(0, 0);
-					player.chooseDirection(1, 0);
-				}
-				if (Math.round(values.x) == 0) {
-					player.chooseDirection(2, 0);
-					player.chooseDirection(3, 0);
-				}
-			});
-
-			gamepad.onbuttondown(function (buttonIndex) {
-				player.placeBomb(self.bombs, materials.black, self.players, self.shadowGenerator);
-			});
-
-			gamepad.onbuttonup(function (buttonIndex) {
-			});
-		}
-
-	};
-
-	if(self.players.length > 2) {
-		var gamepads = new BABYLON.Gamepads(gamepadConnected);
-	}
 
 };

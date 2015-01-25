@@ -1,6 +1,10 @@
 $(document).ready(function(){
 
-	loggedinPlayers = [];
+	var viewModel = null;
+	var loggedinPlayers = [];
+	var availableColors = ['success', 'warning', 'danger', 'info'];
+	var availableAvatars = ['bman_v1', 'bman_v2', 'bman_v3', 'bman_v4'];
+	var availableThemes = ['Test Chamber', 'Space Station'];
 
 	// tooltips
 	$('.option').tooltip();
@@ -16,7 +20,7 @@ $(document).ready(function(){
 		var thisPlayer = this;
 
 		// observables
-		this.active = ko.observable(data.active);
+		this.isActive = ko.observable(data.isActive);
 		this.loggedin = ko.observable(data.loggedin);
 		this.email = ko.observable();
 		this.name = ko.observable(data.name);
@@ -27,7 +31,45 @@ $(document).ready(function(){
 
 		// methods
 		this.togglePlayer = function(){
-			thisPlayer.active(!thisPlayer.active());
+			viewModel.computeAvailableColors(thisPlayer);
+			thisPlayer.color( viewModel.availableColors()[0] );
+			thisPlayer.isActive(!thisPlayer.isActive());
+		};
+
+		this.nextColor = function(){
+			viewModel.computeAvailableColors(thisPlayer);
+			var availableColors = viewModel.availableColors();
+			var newColorIndex = $.inArray(thisPlayer.color(), availableColors) + 1;
+			if(newColorIndex > availableColors.length - 1){
+				newColorIndex = 0;
+			}
+			thisPlayer.color( availableColors[newColorIndex] );
+		};
+
+		this.prevColor = function(){
+			viewModel.computeAvailableColors(thisPlayer);
+			var availableColors = viewModel.availableColors();
+			var newColorIndex = $.inArray(thisPlayer.color(), availableColors) -1;
+			if(newColorIndex == -1){
+				newColorIndex = availableColors.length - 1;
+			}
+			thisPlayer.color( availableColors[newColorIndex] );
+		};
+
+		this.nextAvatar = function(){
+			var newAvatarIndex = $.inArray(thisPlayer.avatar(), availableAvatars) + 1;
+			if(newAvatarIndex > availableAvatars.length - 1){
+				newAvatarIndex = 0;
+			}
+			thisPlayer.avatar( availableAvatars[newAvatarIndex] );
+		};
+
+		this.prevAvatar = function(){
+			var newAvatarIndex = $.inArray(thisPlayer.avatar(), availableAvatars) -1;
+			if(newAvatarIndex == -1){
+				newAvatarIndex = availableAvatars.length - 1;
+			}
+			thisPlayer.avatar( availableAvatars[newAvatarIndex] );
 		};
 
 		// subscriptions
@@ -45,10 +87,10 @@ $(document).ready(function(){
 
 	};
 	var playerArray = [
-		new PlayerViewModel({name: 'Cute', avatar: 'bman_v1', color: 'success', active: true, loggedin: false}),
-		new PlayerViewModel({name: 'Sad', avatar: 'bman_v4', color: 'warning', active: false, loggedin: false}),
-		new PlayerViewModel({name: 'Angry', avatar: 'bman_v2', color: 'danger', active: false, loggedin: false}),
-		new PlayerViewModel({name: 'Weird', avatar: 'bman_v3', color: 'info', active: false, loggedin: false})
+		new PlayerViewModel({name: 'Cute', avatar: 'bman_v1', color: 'success', isActive: true, loggedin: false}),
+		new PlayerViewModel({name: 'Sad', avatar: 'bman_v4', color: 'warning', isActive: false, loggedin: false}),
+		new PlayerViewModel({name: 'Angry', avatar: 'bman_v2', color: 'danger', isActive: false, loggedin: false}),
+		new PlayerViewModel({name: 'Weird', avatar: 'bman_v3', color: 'info', isActive: false, loggedin: false})
 	];
 
 	var ViewModel = function(players) {
@@ -65,11 +107,28 @@ $(document).ready(function(){
 		this.currentPlayer = ko.observable();
 		this.currentModalTemplate = ko.observable('login-template');
 
+		this.availableColors = ko.observable(availableColors);
+
+		// computed observables
 		this.numberOfPlayers = ko.computed(function() {
 			return ko.utils.arrayFilter(self.players(), function(player) {
-				return player.active();
+				return player.isActive();
 			}).length;
 		});
+
+
+		this.computeAvailableColors = function(thisPlayer){
+			var newAvailableColors = ko.utils.arrayFilter(availableColors, function(color) {
+				var found = false;
+				$.each(self.players(), function(key, player){
+					if(player != thisPlayer && player.isActive() && player.color() == color){
+						found = true;
+					}
+				});
+				return !found;
+			});
+			self.availableColors(newAvailableColors);
+		};
 
 		// Operations
 		this.getModalTemplate = function(){
@@ -133,7 +192,7 @@ $(document).ready(function(){
 			else console.log('Please fill out password and email.')
 		};
 
-		// todo check if local storage is available and set players as loggedin and active
+		// todo check if local storage is available and set players as loggedin and isActive
 		playerString = localStorage.getItem("bombermanPlayers");
 		loggedinPlayers = $.parseJSON(playerString);
 
@@ -153,7 +212,8 @@ $(document).ready(function(){
 			if(templatesToLoad.length > 0){
 				loadTemplates(templatesToLoad);
 			} else {
-				ko.applyBindings( new ViewModel(playerArray) );
+				viewModel = new ViewModel(playerArray);
+				ko.applyBindings(viewModel);
 			}
 		});
 	};

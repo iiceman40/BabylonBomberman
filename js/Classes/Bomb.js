@@ -78,8 +78,8 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 			{frame: 15, value: new BABYLON.Vector3(0, 0, 0)}
 		];
 		animationCameraShake.setKeys(keyFramesCameraShake);
-		camera.animations.push(animationCameraShake);
-		scene.beginAnimation(camera, 0, 15, false);
+		console.log(animationCameraShake);
+		scene.beginDirectAnimation(camera, [animationCameraShake], 0, 15, false, 1);
 
 		setTimeout(function () {
 			for(var i=0; i<directions.length; i++){
