@@ -20,6 +20,11 @@
 	<script src="js/Classes/Player.js"></script>
 	<script src="js/Classes/Bomb.js"></script>
 	<script src="js/Classes/PowerUp.js"></script>
+	<!-- Configuration -->
+	<script src="js/Configuration/config.js"></script>
+	<!-- Knockout View Models -->
+	<script src="js/KoViewModels/MenuMain.js"></script>
+	<script src="js/KoViewModels/MenuPlayer.js"></script>
 	<!-- Controller -->
 	<script src="js/Controller/match.js"></script>
 	<script src="js/Controller/menu.js"></script>
@@ -58,6 +63,14 @@
 			</span>
 			<span class="option sound" data-bind="click: toggleSound" data-toggle="tooltip" data-placement="left" title="Sound on/off">
 				<span class="glyphicon" data-bind="css: {'glyphicon-volume-down': sound, 'glyphicon-volume-off': !sound()}"></span>
+			</span>
+			<span class="option map" data-bind="click: cycleMap" data-toggle="tooltip" data-placement="right" title="Choose a map style">
+				<span class="glyphicon glyphicon glyphicon-globe"></span><br />
+				<span data-bind="text: selectedMap"></span>
+			</span>
+			<span class="option theme" data-bind="click: cycleTheme" data-toggle="tooltip" data-placement="bottom" title="Choose a theme">
+				<span class="glyphicon glyphicon-picture"></span><br />
+				<span data-bind="text: selectedTheme"></span>
 			</span>
 		</div>
 
