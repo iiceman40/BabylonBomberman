@@ -19,6 +19,9 @@ var Materials = function(scene) {
 	this.blue = new BABYLON.StandardMaterial("blue", scene);
 	this.blue.diffuseColor = BABYLON.Color3.Blue();
 
+	this.lightBlue = new BABYLON.StandardMaterial("lightBlue", scene);
+	this.lightBlue.diffuseColor = BABYLON.Color3.FromInts(100,150,190);
+
 	this.yellow = new BABYLON.StandardMaterial("yellow", scene);
 	this.yellow.diffuseColor = BABYLON.Color3.Yellow();
 

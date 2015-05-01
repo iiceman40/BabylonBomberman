@@ -206,15 +206,18 @@ var Game = function (scene, mapOptions, materials, camera, numberOfPlayers) {
 			new BABYLON.Vector3(-mapOptions.width / 2 + 5, 2, -mapOptions.height / 2 + 5),
 			new BABYLON.Vector3(mapOptions.width / 2 - 5, 2, -mapOptions.height / 2 + 5)
 		];
+
+		// TODO separate the face from the head color and load it dynamically according to user choice in the menu
+
 		var playerMaterials = [
 			materials.green,
-			materials.blue,
+			materials.lightBlue,
 			materials.red,
 			materials.yellow
 		];
 		var playerHeadMaterials = [
 			materials.greenCute,
-			materials.blue,
+			materials.lightBlue,
 			materials.red,
 			materials.yellow
 		];
@@ -265,7 +268,7 @@ var Game = function (scene, mapOptions, materials, camera, numberOfPlayers) {
 				console.log('random effect 2 - slow');
 				player.startInfection();
 				var originalPlayerSpeed = player.speed;
-				player.speed = 5;
+				player.speed = 1;
 				setTimeout(function(){
 					player.speed = originalPlayerSpeed;
 					player.stopInfection();
@@ -365,7 +368,7 @@ var Game = function (scene, mapOptions, materials, camera, numberOfPlayers) {
 						// place destroyable box
 						var name = "cube-x" + x + "y" + y;
 						// finally create the box it self and add it to the grid
-						boxInGrid = Box(scene, newBoxPosition, box, collisionBox, name, self.shadowGenerator, self.availablePowerUps, self.players);
+						boxInGrid = new Box(scene, newBoxPosition, box, collisionBox, name, self.shadowGenerator, self.availablePowerUps, self.players);
 					}
 
 					// add the fixed or destroyable box to the grid

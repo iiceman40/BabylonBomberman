@@ -1660,7 +1660,7 @@ if (typeof jQuery === 'undefined') {
     self.tip().hasClass('in') ? self.leave(self) : self.enter(self)
   }
 
-  Tooltip.prototype.destroy = function () {
+  Tooltip.prototype.destroyMe = function () {
     var that = this
     clearTimeout(this.timeout)
     this.hide(function () {
@@ -1799,7 +1799,7 @@ if (typeof jQuery === 'undefined') {
       var options  = typeof option == 'object' && option
       var selector = options && options.selector
 
-      if (!data && option == 'destroy') return
+      if (!data && option == 'destroyMe') return
       if (selector) {
         if (!data) $this.data('bs.popover', (data = {}))
         if (!data[selector]) data[selector] = new Popover(this, options)

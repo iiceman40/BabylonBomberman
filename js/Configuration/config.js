@@ -9,7 +9,7 @@ var mapOptions = {
 };
 
 var loggedinPlayers  = [];
-var availableColors  = ['success', 'warning', 'danger', 'info'];
+var availableColors  = ['success', 'info', 'warning', 'danger', 'default'];
 var availableAvatars = ['bman_v1', 'bman_v2', 'bman_v3', 'bman_v4'];
 var availableThemes  = ['Test Chamber', 'Space Station', 'Castle'];
 var availableMaps    = ['Classic', 'Tubes', 'Ramps'];

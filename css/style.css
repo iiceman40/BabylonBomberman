@@ -239,8 +239,11 @@ h1 small {
 	margin-right: 3em;
 }
 
-.colorSelection{
+.colorSelection {
 	margin-top: 10%;
+}
+.colorSelection button{
+	opacity: 0.6;
 }
 .colorSelection .btn:focus {
 	outline: none;

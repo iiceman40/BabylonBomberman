@@ -4,9 +4,6 @@ var Box = function (scene, position, boxTemplate, collisionBoxTemplate, name, sh
 	var boxAvatar = boxTemplate.createInstance("x" + position.x + "y" + position.y); //boxTemplate.clone(name);
 	boxAvatar.position = position;
 	boxAvatar.boxForThisAvatar = self;
-	boxAvatar.applyGravity = true;
-	//boxAvatar.checkCollisions = true;
-	//boxAvatar.receiveShadows = true;
 	shadowGenerator.getShadowMap().renderList.push(boxAvatar);
 
 	this.avatar = boxAvatar;
@@ -48,6 +45,7 @@ var Box = function (scene, position, boxTemplate, collisionBoxTemplate, name, sh
 					self.spawnPowerUp();
 				}
 
+				self.collisionBox.dispose();
 				boxAvatar.dispose();
 			}, 500);
 		}

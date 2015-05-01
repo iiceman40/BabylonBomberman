@@ -10,7 +10,7 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 	var bombAvatar = BABYLON.Mesh.CreateSphere("bomb", 16, 4, scene);
 	bombAvatar.material = bombMaterial;
 	bombAvatar.position = bombPosition;
-	bombAvatar.receiveShadows = true;
+	//bombAvatar.receiveShadows = true;
 	bombAvatar.bombForThisAvatar = self;
 	shadowGenerator.getShadowMap().renderList.push(bombAvatar);
 

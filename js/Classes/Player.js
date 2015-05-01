@@ -1,98 +1,8 @@
 var Player = function(id, name, material, headMaterial, spawnPosition, scene, infectedMaterial, camera){
 	var self = this;
 
-	// avatar
-	var playerAvatar = BABYLON.Mesh.CreateSphere(name, 16, 3, scene);
-	playerAvatar.visibility = 0;
-	playerAvatar.scaling = new BABYLON.Vector3(1.2, 1.2, 1.2);
-	playerAvatar.checkCollisions = true;
-	playerAvatar.ellipsoid = new BABYLON.Vector3(2, 4, 2);
-	playerAvatar.ellipsoidOffset = new BABYLON.Vector3(0, 6, 0);
-	playerAvatar.applyGravity = true;
-	playerAvatar.isPlayerAvatar = true;
-
-	this.bodyParts = [];
-
-	var playerBody = BABYLON.Mesh.CreateSphere(name, 16, 2.5, scene);
-	playerBody.position.y = 0.9;
-	playerBody.scaling.z = 0.7;
-	playerBody.parent = playerAvatar;
-	playerBody.material = material;
-	this.bodyParts.push(playerBody);
-
-	var playerHead = BABYLON.Mesh.CreateSphere(name, 16, 2.5, scene);
-	playerHead.parent = playerBody;
-	playerHead.position.y = 1.5;
-	playerHead.scaling.z = 1.42;
-	playerHead.material = headMaterial;
-	this.bodyParts.push(playerHead);
-
-	var playerHeadBubble = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
-	playerHeadBubble.parent = playerHead;
-	playerHeadBubble.position.y = 1.2;
-	playerHeadBubble.position.z = -0.7;
-	this.bodyParts.push(playerHeadBubble);
-
-	var leftShoulder = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
-	leftShoulder.position.y = 0.75;
-	leftShoulder.parent = playerBody;
-	leftShoulder.visibility = 0;
-
-	var leftHand = BABYLON.Mesh.CreateSphere(name, 16, 1.5, scene);
-	leftHand.scaling.x = 0.3;
-	leftHand.scaling.z = 0.5;
-	leftHand.parent = leftShoulder;
-	leftHand.position.x = -1.4;
-	leftHand.position.y = -0.7;
-	leftHand.rotation.z = -Math.PI/8;
-	this.bodyParts.push(leftHand);
-
-
-	var rightShoulder = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
-	rightShoulder.position.y = 0.75;
-	rightShoulder.parent = playerBody;
-	rightShoulder.visibility = 0;
-
-	var rightHand = BABYLON.Mesh.CreateSphere(name, 16, 1.5, scene);
-	rightHand.scaling.x = 0.3;
-	rightHand.scaling.z = 0.5;
-	rightHand.parent = rightShoulder;
-	rightHand.position.x = 1.4;
-	rightHand.position.y = -0.7;
-	rightHand.rotation.z = Math.PI/8;
-	this.bodyParts.push(rightHand);
-
-	var leftHip = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
-	leftHip.parent = playerBody;
-	leftHip.visibility = 0;
-
-	var leftFoot = BABYLON.Mesh.CreateSphere(name, 16, 2, scene);
-	leftFoot.scaling.x = 0.5;
-	leftFoot.scaling.z = 0.5;
-	leftFoot.parent = leftHip;
-	leftFoot.position.x = -0.5;
-	leftFoot.position.y = -1.5;
-	this.bodyParts.push(leftFoot);
-
-	var rightHip = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
-	rightHip.parent = playerBody;
-	rightHip.visibility = 0;
-
-	var rightFoot = BABYLON.Mesh.CreateSphere(name, 16, 2, scene);
-	rightFoot.scaling.x = 0.5;
-	rightFoot.scaling.z = 0.5;
-	rightFoot.parent = rightHip;
-	rightFoot.position.x = 0.5;
-	rightFoot.position.y = -1.5;
-	this.bodyParts.push(rightFoot);
-
-	playerAvatar.position = spawnPosition;
-
-	playerAvatar.material = material;
-	playerAvatar.receiveShadows = true;
-	playerAvatar.playerForThisBomb = this;
-
-	this.avatar = playerAvatar;
+	// body parts for walking animation
+	var playerAvatar, playerBody, playerHead, playerHeadBubble, leftShoulder, leftHand, rightShoulder, rightHand, leftHip, leftFoot, rightHip, rightFoot;
 
 	// playerForThisBomb stats
 	this.id = id;
@@ -112,9 +22,108 @@ var Player = function(id, name, material, headMaterial, spawnPosition, scene, in
 		self.move();
 	});
 
+
+
 	/*
 	 * METHODS
 	 */
+	this.createPlayerAvatar = function(){
+		var playerAvatar = BABYLON.Mesh.CreateSphere(name, 16, 3, scene);
+		playerAvatar.visibility = 0;
+		playerAvatar.scaling = new BABYLON.Vector3(1.2, 1.2, 1.2);
+		playerAvatar.checkCollisions = true;
+		playerAvatar.ellipsoid = new BABYLON.Vector3(2, 4, 2);
+		playerAvatar.ellipsoidOffset = new BABYLON.Vector3(0, 6, 0);
+		playerAvatar.applyGravity = true;
+		playerAvatar.isPlayerAvatar = true;
+
+		this.bodyParts = [];
+
+		playerBody = BABYLON.Mesh.CreateSphere(name, 16, 2.5, scene);
+		playerBody.position.y = 0.9;
+		playerBody.scaling.z = 0.7;
+		playerBody.parent = playerAvatar;
+		playerBody.material = material;
+		this.bodyParts.push(playerBody);
+
+		playerHead = BABYLON.Mesh.CreateSphere(name, 16, 2.5, scene);
+		playerHead.parent = playerBody;
+		playerHead.position.y = 1.5;
+		playerHead.scaling.z = 1.42;
+		playerHead.material = headMaterial;
+		this.bodyParts.push(playerHead);
+
+		playerHeadBubble = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
+		playerHeadBubble.parent = playerHead;
+		playerHeadBubble.position.y = 1.2;
+		playerHeadBubble.position.z = -0.7;
+		this.bodyParts.push(playerHeadBubble);
+
+		leftShoulder = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
+		leftShoulder.position.y = 0.75;
+		leftShoulder.parent = playerBody;
+		leftShoulder.visibility = 0;
+
+		leftHand = BABYLON.Mesh.CreateSphere(name, 16, 1.5, scene);
+		leftHand.scaling.x = 0.3;
+		leftHand.scaling.z = 0.5;
+		leftHand.parent = leftShoulder;
+		leftHand.position.x = -1.4;
+		leftHand.position.y = -0.7;
+		leftHand.rotation.z = -Math.PI/8;
+		this.bodyParts.push(leftHand);
+
+
+		rightShoulder = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
+		rightShoulder.position.y = 0.75;
+		rightShoulder.parent = playerBody;
+		rightShoulder.visibility = 0;
+
+		rightHand = BABYLON.Mesh.CreateSphere(name, 16, 1.5, scene);
+		rightHand.scaling.x = 0.3;
+		rightHand.scaling.z = 0.5;
+		rightHand.parent = rightShoulder;
+		rightHand.position.x = 1.4;
+		rightHand.position.y = -0.7;
+		rightHand.rotation.z = Math.PI/8;
+		this.bodyParts.push(rightHand);
+
+		leftHip = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
+		leftHip.parent = playerBody;
+		leftHip.visibility = 0;
+
+		leftFoot = BABYLON.Mesh.CreateSphere(name, 16, 2, scene);
+		leftFoot.scaling.x = 0.5;
+		leftFoot.scaling.z = 0.5;
+		leftFoot.parent = leftHip;
+		leftFoot.position.x = -0.5;
+		leftFoot.position.y = -1.5;
+		this.bodyParts.push(leftFoot);
+
+		rightHip = BABYLON.Mesh.CreateSphere(name, 16, 0.5, scene);
+		rightHip.parent = playerBody;
+		rightHip.visibility = 0;
+
+		rightFoot = BABYLON.Mesh.CreateSphere(name, 16, 2, scene);
+		rightFoot.scaling.x = 0.5;
+		rightFoot.scaling.z = 0.5;
+		rightFoot.parent = rightHip;
+		rightFoot.position.x = 0.5;
+		rightFoot.position.y = -1.5;
+		this.bodyParts.push(rightFoot);
+
+		playerAvatar.position = spawnPosition;
+
+		playerAvatar.material = material;
+		playerAvatar.receiveShadows = true;
+		playerAvatar.playerForThisBomb = this;
+
+		return playerAvatar;
+	};
+
+	// create avatar
+	this.avatar = this.createPlayerAvatar();
+
 	this.stopWalkingAnimation = function(){
 		for(var i=0; i<this.walkingAnimations.length; i++){
 			this.walkingAnimations[i].pause();
@@ -166,10 +175,10 @@ var Player = function(id, name, material, headMaterial, spawnPosition, scene, in
 		self.infectionInterval = setInterval(function(){
 			if(blink == 0){
 				blink = 1;
-				playerAvatar.material = infectedMaterial;
+				self.avatar.material = infectedMaterial;
 			} else {
 				blink = 0;
-				playerAvatar.material = material;
+				self.avatar.material = material;
 			}
 		}, 300);
 	};
@@ -177,7 +186,7 @@ var Player = function(id, name, material, headMaterial, spawnPosition, scene, in
 	this.stopInfection = function(){
 		clearInterval(self.infectionInterval);
 		self.infectionInterval = null;
-		playerAvatar.material = material;
+		self.avatar.material = material;
 	};
 
 	this.move = function () {
