@@ -1,10 +1,15 @@
-var Player = function(name, material, headMaterial, spawnPosition, scene, infectedMaterial, camera){
+var Player = function(id, name, material, headMaterial, spawnPosition, scene, infectedMaterial, camera){
 	var self = this;
 
 	// avatar
 	var playerAvatar = BABYLON.Mesh.CreateSphere(name, 16, 3, scene);
 	playerAvatar.visibility = 0;
 	playerAvatar.scaling = new BABYLON.Vector3(1.2, 1.2, 1.2);
+	playerAvatar.checkCollisions = true;
+	playerAvatar.ellipsoid = new BABYLON.Vector3(2, 4, 2);
+	playerAvatar.ellipsoidOffset = new BABYLON.Vector3(0, 6, 0);
+	playerAvatar.applyGravity = true;
+	playerAvatar.isPlayerAvatar = true;
 
 	this.bodyParts = [];
 
@@ -82,11 +87,6 @@ var Player = function(name, material, headMaterial, spawnPosition, scene, infect
 	this.bodyParts.push(rightFoot);
 
 	playerAvatar.position = spawnPosition;
-	playerAvatar.impostor = playerAvatar.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, {
-		mass: 100,
-		friction: 0.001,
-		restitution: 0.999
-	});
 
 	playerAvatar.material = material;
 	playerAvatar.receiveShadows = true;
@@ -95,18 +95,22 @@ var Player = function(name, material, headMaterial, spawnPosition, scene, infect
 	this.avatar = playerAvatar;
 
 	// playerForThisBomb stats
+	this.id = id;
 	this.name = name;
 	this.isDead = false;
-	this.speed = 15;
+	this.speed = 0.5;
 	this.limit = 1;
 	this.range = 5;
 	this.activeBombs = 0;
 
 	this.mvtDirection = [0, 0, 0, 0];
 	this.infectionInterval = null;
-	this.newRotation = 0;
 
 	this.walkingAnimations = [];
+
+	scene.registerBeforeRender(function () {
+		self.move();
+	});
 
 	/*
 	 * METHODS
@@ -178,7 +182,7 @@ var Player = function(name, material, headMaterial, spawnPosition, scene, infect
 
 	this.move = function () {
 
-		var moveVector = BABYLON.Vector3.Zero();
+		var moveVector = new BABYLON.Vector3(0, GRAVITY, 0);
 
 		if (this.mvtDirection[0] != 0) {
 			moveVector = moveVector.add(new BABYLON.Vector3(0, 0, 1));
@@ -193,12 +197,14 @@ var Player = function(name, material, headMaterial, spawnPosition, scene, infect
 			moveVector = moveVector.add(new BABYLON.Vector3(1, 0, 0));
 		}
 
-		//this.avatar.impostor.body.linearVelocity.scaleEqual(0.92);
-		this.avatar.impostor.body.angularVelocity = new OIMO.Vec3();
-		this.avatar.impostor.body.angularVelocity.scaleEqual(0);
+		this.avatar.moveWithCollisions(moveVector.scale(this.speed));
+		this.rotateAvatarAccordingToMoveVector(moveVector);
+		this.toggleWalkingAnimationOnMovement(moveVector);
 
+	};
+
+	this.rotateAvatarAccordingToMoveVector = function(moveVector){
 		var moveVectorNormalized = moveVector.normalize();
-		var finalMoveVector = moveVectorNormalized.scale(this.speed);
 
 		// rotate avatar
 		var v1 = new BABYLON.Vector3(0,0,1);
@@ -241,21 +247,20 @@ var Player = function(name, material, headMaterial, spawnPosition, scene, infect
 
 		}
 
-		this.avatar.updatePhysicsBodyPosition();
+	};
 
-		if(moveVector.length() != 0){
+	this.toggleWalkingAnimationOnMovement = function(moveVector){
+		if(moveVector.x != 0 || moveVector.z != 0){
 			this.continueWalkingAnimation();
 		} else {
 			this.stopWalkingAnimation();
 		}
-
-		finalMoveVector.y = -20;
-		this.avatar.applyImpulse(finalMoveVector, this.avatar.position);
-
 	};
 
 	this.chooseDirection = function (direction, value) {
-		this.mvtDirection[direction] = value;
+		if(this.mvtDirection[direction] != value) {
+			this.mvtDirection[direction] = value;
+		}
 	};
 
 	this.placeBomb = function(bombs, bombMaterial, players, shadowGenerator) {

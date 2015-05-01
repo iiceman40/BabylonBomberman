@@ -22,11 +22,7 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 	bombAvatar.actionManager.registerAction(new BABYLON.DoNothingAction(enterTrigger));
 	bombAvatar.actionManager.registerAction(new BABYLON.ExecuteCodeAction(exitTrigger, function () {
 		if (!self.isExploding) {
-			bombAvatar.impostor = bombAvatar.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, {
-				mass: 100000,
-				friction: 0.001,
-				restitution: 0.999
-			});
+			// TODO make solid without physics
 		}
 	}));
 
@@ -78,7 +74,8 @@ var Bomb = function (scene, bombs, bombMaterial, bombPosition, player, players, 
 			{frame: 15, value: new BABYLON.Vector3(0, 0, 0)}
 		];
 		animationCameraShake.setKeys(keyFramesCameraShake);
-		console.log(animationCameraShake);
+
+		// camera shake animation
 		scene.beginDirectAnimation(camera, [animationCameraShake], 0, 15, false, 1);
 
 		setTimeout(function () {

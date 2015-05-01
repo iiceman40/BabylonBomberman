@@ -1,19 +1,20 @@
-var Box = function (scene, position, boxTemplate, name, shadowGenerator, availablePowerUps, players) {
+var Box = function (scene, position, boxTemplate, collisionBoxTemplate, name, shadowGenerator, availablePowerUps, players) {
 	var self = this;
 
-	var boxAvatar = boxTemplate.clone(name);
+	var boxAvatar = boxTemplate.createInstance("x" + position.x + "y" + position.y); //boxTemplate.clone(name);
 	boxAvatar.position = position;
 	boxAvatar.boxForThisAvatar = self;
-	boxAvatar.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {
-		mass: 10000000,
-		friction: 0.001,
-		restitution: 0.001
-	});
 	boxAvatar.applyGravity = true;
-	boxAvatar.receiveShadows = true;
+	//boxAvatar.checkCollisions = true;
+	//boxAvatar.receiveShadows = true;
 	shadowGenerator.getShadowMap().renderList.push(boxAvatar);
-	
+
 	this.avatar = boxAvatar;
+
+	this.collisionBox = collisionBoxTemplate.createInstance();
+	this.collisionBox.checkCollisions = true;
+	this.collisionBox.position = position;
+
 	this.isDestroyed = false;
 
 
@@ -95,7 +96,8 @@ var Box = function (scene, position, boxTemplate, name, shadowGenerator, availab
 		particleSystem.disposeOnStop = true;
 
 		particleSystem.start();
-	}
+	};
 
 
+	return this;
 };

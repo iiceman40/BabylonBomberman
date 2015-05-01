@@ -1,5 +1,13 @@
 var viewModel = null;
 
+var GRAVITY = -1;
+
+var mapOptions = {
+	height: 60,
+	width: 100,
+	gridSize: 5
+};
+
 var loggedinPlayers  = [];
 var availableColors  = ['success', 'warning', 'danger', 'info'];
 var availableAvatars = ['bman_v1', 'bman_v2', 'bman_v3', 'bman_v4'];

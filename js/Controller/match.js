@@ -16,16 +16,12 @@ $(document).ready(function () {
 
 var createGame = function(data){
 
-	/* CONSTANTS */
-	var map = {
-		height: 60,
-		width: 100
-	};
-
 	/* SCENE SETUP */
 	scene = new BABYLON.Scene(engine);
+	scene.gravity = new BABYLON.Vector3(0, GRAVITY, 0);
+	scene.collisionsEnabled = true;
 	scene.clearColor = new BABYLON.Color4(0,0,0,0);
-	scene.enablePhysics(new BABYLON.Vector3(0, -100, 0), new BABYLON.OimoJSPlugin());
+
 	// Camera attached to the canvas
 	var camera = new BABYLON.ArcRotateCamera("cam", 3.0, 3.0, 800, new BABYLON.Vector3(0, 0, 0), scene);
 	camera.attachControl(engine.getRenderingCanvas());
@@ -35,7 +31,8 @@ var createGame = function(data){
 
 	/* GAME */
 	var numberOfPlayers = data.numberOfPlayers;
-	var game = new Game(scene, map, materials, camera, numberOfPlayers);
+	// TODO separate game and scene objects as much as possible - for example: move the shadow generator to an independent variable instead of passing it as a parameter?
+	var game = new Game(scene, mapOptions, materials, camera, numberOfPlayers);
 
 	/* RENDERING */
 	stats = $('#stats');
@@ -53,11 +50,7 @@ var createGame = function(data){
 
 	engine.runRenderLoop(function () {
 		scene.render();
-		showStats.text((BABYLON.Tools.GetFps().toFixed()));
-	});
-
-	scene.registerBeforeRender(function () {
-		game.update();
+		showStats.text(engine.getFps().toFixed());
 	});
 
 };
