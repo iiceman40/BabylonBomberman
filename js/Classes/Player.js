@@ -216,24 +216,18 @@ var Player = function(id, name, material, headMaterial, spawnPosition, scene, in
 
 		if(moveVector.x != 0 || moveVector.z != 0){
 
-			var moveVectorNormalized = moveVector.normalize();
-
 			// rotate avatar
-			var v1 = new BABYLON.Vector3(0,1);
-			var v2 = new BABYLON.Vector3(moveVectorNormalized.x, moveVectorNormalized.z);
+			var v1 = new BABYLON.Vector2(0,1);
+			var v2 = new BABYLON.Vector2(moveVector.x, moveVector.z);
 
-			var angle = Math.acos(BABYLON.Vector2.Dot(v1, v2));
-
-			// FIXME angle is not a product of PI but something like 135 degrees instead of 90 or 180
+			var angle = Math.acos(BABYLON.Vector2.Dot(v1, v2.normalize()));
 
 			if(!isNaN(angle)) {
-				if (moveVectorNormalized.x < 0) angle = angle * -1;
+				if (moveVector.x < 0) angle = angle * -1;
 
 				// calculate both angles in degrees
 				var angleDegrees = Math.round(angle * 180 / Math.PI);
 				var playerRotationDegrees = Math.round(this.avatar.rotation.y * 180 / Math.PI);
-
-				//console.log(v1,v2, angle, angleDegrees);
 
 				// calculate the delta
 				var deltaDegrees = playerRotationDegrees - angleDegrees;

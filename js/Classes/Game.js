@@ -331,10 +331,18 @@ var Game = function (scene, mapOptions, materials, camera, numberOfPlayers) {
 
 		// starting positions in the format 'x-y'
 		var startingPositions = [
-			'1-1',                      // top left
-			width-1 + '-1',             // top right
-			'1-' + (height-1),          // bottom left
-			width-1 + '-' + (height-1)  // bottom right
+			'1-1',                      // the 3 top left corner tiles
+			'2-1',
+			'1-2',
+			width-1 + '-1',             // the 3 top right corner tiles
+			width-2 + '-1',
+			width-1 + '-2',
+			'1-' + (height-1),          // the 3 bottom left corner tiles
+			'2-' + (height-1),
+			'1-' + (height-2),
+			width-1 + '-' + (height-1),  // the 3 bottom right corner tiles
+			width-2 + '-' + (height-1),
+			width-1 + '-' + (height-2)
 		];
 
 		for (var y=1; y < height; y++) {
