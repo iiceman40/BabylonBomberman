@@ -206,52 +206,59 @@ var Player = function(id, name, material, headMaterial, spawnPosition, scene, in
 			moveVector = moveVector.add(new BABYLON.Vector3(1, 0, 0));
 		}
 
-		this.avatar.moveWithCollisions(moveVector.scale(this.speed));
+		this.avatar.moveWithCollisions(moveVector.normalize().scale(this.speed));
 		this.rotateAvatarAccordingToMoveVector(moveVector);
 		this.toggleWalkingAnimationOnMovement(moveVector);
 
 	};
 
 	this.rotateAvatarAccordingToMoveVector = function(moveVector){
-		var moveVectorNormalized = moveVector.normalize();
 
-		// rotate avatar
-		var v1 = new BABYLON.Vector3(0,0,1);
-		var v2 = moveVectorNormalized;
+		if(moveVector.x != 0 || moveVector.z != 0){
 
-		var productVector = BABYLON.Vector3.Dot(v1, v2);
-		var productLength = v1.length() * v2.length();
-		var angle = Math.acos(productVector / productLength);
+			var moveVectorNormalized = moveVector.normalize();
 
-		if(!isNaN(angle)) {
-			if(moveVectorNormalized.x<0) angle = angle * -1;
+			// rotate avatar
+			var v1 = new BABYLON.Vector3(0,1);
+			var v2 = new BABYLON.Vector3(moveVectorNormalized.x, moveVectorNormalized.z);
 
-			// calculate both angles in degrees
-			var angleDegrees = Math.round(angle * 180/Math.PI);
-			var playerRotationDegress = Math.round(this.avatar.rotation.y * 180/Math.PI);
+			var angle = Math.acos(BABYLON.Vector2.Dot(v1, v2));
 
-			// calculate the delta
-			var deltaDegrees = playerRotationDegress - angleDegrees;
+			// FIXME angle is not a product of PI but something like 135 degrees instead of 90 or 180
 
-			// check what direction to turn to take the shotest turn
-			if(deltaDegrees > 180){
-				deltaDegrees = deltaDegrees - 360;
-			} else if(deltaDegrees < -180){
-				deltaDegrees = deltaDegrees + 360;
-			}
+			if(!isNaN(angle)) {
+				if (moveVectorNormalized.x < 0) angle = angle * -1;
 
-			var rotationSpeed = Math.round(Math.abs(deltaDegrees)/8);
-			if(deltaDegrees > 0){
-				this.avatar.rotation.y -= rotationSpeed * Math.PI/180;
-				if(this.avatar.rotation.y < -Math.PI){
-					this.avatar.rotation.y = Math.PI;
+				// calculate both angles in degrees
+				var angleDegrees = Math.round(angle * 180 / Math.PI);
+				var playerRotationDegrees = Math.round(this.avatar.rotation.y * 180 / Math.PI);
+
+				//console.log(v1,v2, angle, angleDegrees);
+
+				// calculate the delta
+				var deltaDegrees = playerRotationDegrees - angleDegrees;
+
+				// check what direction to turn to take the shortest turn
+				if (deltaDegrees > 180) {
+					deltaDegrees = deltaDegrees - 360;
+				} else if (deltaDegrees < -180) {
+					deltaDegrees = deltaDegrees + 360;
 				}
-			}
-			if(deltaDegrees < 0 ) {
-				this.avatar.rotation.y += rotationSpeed * Math.PI / 180;
-				if(this.avatar.rotation.y > Math.PI){
-					this.avatar.rotation.y = -Math.PI;
+
+				var rotationSpeed = Math.round(Math.abs(deltaDegrees) / 8);
+				if (deltaDegrees > 0) {
+					this.avatar.rotation.y -= rotationSpeed * Math.PI / 180;
+					if (this.avatar.rotation.y < -Math.PI) {
+						this.avatar.rotation.y = Math.PI;
+					}
 				}
+				if (deltaDegrees < 0) {
+					this.avatar.rotation.y += rotationSpeed * Math.PI / 180;
+					if (this.avatar.rotation.y > Math.PI) {
+						this.avatar.rotation.y = -Math.PI;
+					}
+				}
+
 			}
 
 		}
