@@ -57,7 +57,7 @@ var Game = function (scene, mapOptions, materials, camera, numberOfPlayers) {
 	};
 
 	// define load background image
-	var backgroundImageTask = assetsManager.addImageTask("backgroundImageTask", "http://fusionflight.com/wp-content/uploads/2014/08/Earth-From-Space-Space-1080x1920.jpg");
+	var backgroundImageTask = assetsManager.addImageTask("backgroundImageTask", "images/Earth-From-Space-Space-1080x1920.jpg");
 
 	// execute load everything
 	assetsManager.load();
